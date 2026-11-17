@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akcje – zadania krok po kroku</title>
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface2:#eef1f5; --text:#1b2230; --muted:#5b6578;
+  --line:#d9dee7; --accent:#1f5fd6; --accent-soft:#e3ecfc; --ok:#12805c; --ok-soft:#dff4ea;
+  --bad:#c0392b; --bad-soft:#fbe5e2; --warn:#a85d00; --warn-soft:#fff1d9; --eq:#f1f4fa;
+  --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 14px rgba(20,30,50,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f141c; --surface:#171e29; --surface2:#1f2836; --text:#e6eaf2; --muted:#9aa5b8;
+    --line:#2b3547; --accent:#6ea0ff; --accent-soft:#1c2a47; --ok:#4cd1a0; --ok-soft:#12332a;
+    --bad:#ff8a7a; --bad-soft:#3a1d1a; --warn:#ffb84d; --warn-soft:#3a2c12; --eq:#1b2433;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --surface:#171e29; --surface2:#1f2836; --text:#e6eaf2; --muted:#9aa5b8;
+  --line:#2b3547; --accent:#6ea0ff; --accent-soft:#1c2a47; --ok:#4cd1a0; --ok-soft:#12332a;
+  --bad:#ff8a7a; --bad-soft:#3a1d1a; --warn:#ffb84d; --warn-soft:#3a2c12; --eq:#1b2433; --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+header{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.hbar{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.brand{font-weight:700;font-size:18px;letter-spacing:.2px}
+.brand small{font-weight:500;color:var(--muted);font-size:13px;margin-left:6px}
+nav{display:flex;gap:4px;margin-left:8px}
+nav button{border:0;background:transparent;padding:7px 14px;border-radius:8px;color:var(--muted);font-weight:600}
+nav button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+.sp{flex:1}
+.prog{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.bar{width:120px;height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;font-size:14px}
+main{max-width:1280px;margin:0 auto;padding:16px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start}
+aside{position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.sidehead{padding:12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.sidehead input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--surface);padding:2px 9px;border-radius:99px;font-size:12px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.grp{padding:8px 12px 2px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.item{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:8px 12px;border-left:3px solid transparent}
+.item:hover{background:var(--surface2)}
+.item[aria-current="true"]{background:var(--accent-soft);border-left-color:var(--accent)}
+.item .st{width:20px;text-align:center;font-size:14px;color:var(--muted)}
+.item .st.ok{color:var(--ok)} .item .st.bad{color:var(--bad)}
+.item .lb{flex:1;font-size:14px;line-height:1.3}
+.item .lb small{display:block;color:var(--muted);font-size:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px}
+.thead{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:6px}
+.thead h2{margin:0;font-size:21px;line-height:1.25}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap}
+.tag{background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px}
+.stmt{margin:14px 0;padding:14px 16px;background:var(--surface2);border-radius:10px;border-left:4px solid var(--accent);font-family:Georgia,"Times New Roman",serif;font-size:16.5px}
+.stmt p{margin:0 0 6px}
+.opts{display:grid;gap:8px;margin:10px 0 4px}
+.opt{display:flex;gap:12px;align-items:center;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;text-align:left;width:100%}
+.opt:hover{border-color:var(--accent)}
+.opt b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--surface2);font-size:13px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)} .opt.ok b{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)} .opt.bad b{background:var(--bad);color:#fff}
+.opt.sol{border-color:var(--ok);border-style:dashed}
+.fb{margin:8px 0;padding:8px 12px;border-radius:8px;font-size:14.5px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)} .fb.bad{background:var(--bad-soft);color:var(--bad)}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:9px;font-weight:600}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:hover:not(:disabled){filter:brightness(.97)}
+.uses{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted);margin:8px 0}
+.uchip{border:1px dashed var(--line);background:var(--surface);padding:2px 9px;border-radius:8px;font-size:13px;color:var(--text)}
+.uchip:hover{border-color:var(--accent);color:var(--accent)}
+.step{border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.step>h4{margin:0;padding:9px 14px;background:var(--surface2);font-size:15px;display:flex;gap:10px;align-items:center}
+.step>h4 i{font-style:normal;display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px}
+.step .bd{padding:10px 14px;min-width:0}
+#main,.card{min-width:0}
+.fcards{grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))}
+.step .bd ul{margin:4px 0 4px 18px;padding:0}
+.eq{font-family:Cambria,"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:18px;background:var(--eq);padding:6px 12px;border-radius:8px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.eq b{color:var(--accent)}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .22em;line-height:1.25}
+.fr>.n{border-bottom:1.5px solid currentColor;padding:0 .3em}
+.fr>.d{padding:0 .3em}
+.result{margin:8px 0;padding:10px 14px;border-radius:10px;background:var(--ok-soft);color:var(--ok);font-weight:700;font-size:17px}
+.note{margin:8px 0;padding:8px 12px;border-radius:8px;background:var(--accent-soft);font-size:14.5px}
+.warn{margin:8px 0;padding:8px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-size:14.5px}
+table.t{border-collapse:collapse;font-size:14px;margin:6px 0;min-width:60%}
+table.t th,table.t td{border:1px solid var(--line);padding:4px 10px;text-align:right}
+table.t th{background:var(--surface2);text-align:center}
+.tblwrap{overflow-x:auto}
+.finalbox{margin-top:14px;padding:14px 16px;border-radius:12px;border:2px solid var(--ok);background:var(--ok-soft)}
+.finalbox .big{font-size:20px;font-weight:800;color:var(--ok)}
+.finalbox .tr{margin-top:8px;color:var(--text);font-size:14.5px}
+details.params{margin:14px 0;border:1px dashed var(--line);border-radius:10px;padding:8px 12px;background:var(--surface)}
+details.params summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:10px}
+.pgrid label{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:3px}
+.pgrid input{padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:inherit;width:100%}
+.pgrid .u{color:var(--muted);font-size:12px}
+.nav2{display:flex;justify-content:space-between;margin-top:16px;gap:8px}
+.fcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.fcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+.fcard h4{margin:0 0 4px;font-size:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{font-size:11px;padding:1px 8px;border-radius:99px;font-weight:700}
+.badge.sheet{background:var(--ok-soft);color:var(--ok)} .badge.extra{background:var(--warn-soft);color:var(--warn)}
+.fcard .where{font-size:13.5px;color:var(--muted)}
+.fcard.hl{outline:3px solid var(--accent)}
+.tabsel{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tabsel button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+table.ft{border-collapse:collapse;font-size:13px;white-space:nowrap}
+table.ft th,table.ft td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+table.ft th{background:var(--surface2);position:sticky;top:0}
+table.ft td:first-child,table.ft th:first-child{position:sticky;left:0;background:var(--surface2);font-weight:700;text-align:center}
+table.ft td.hc{background:var(--accent-soft)}
+table.ft td.hit{background:var(--accent);color:#fff;font-weight:700}
+.calc{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:12px 0}
+.calc label{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:3px}
+.calc input,.calc select{padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:inherit}
+.menu-m{display:none}
+.hint{color:var(--muted);font-size:13.5px}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .hbar{gap:8px}
+  .brand small{display:none}
+  nav{margin-left:0}
+  .card{padding:14px}
+  aside{position:static;max-height:none;display:none}
+  aside.open{display:block}
+  .menu-m{display:inline-block}
+  .stmt{font-size:15.5px}
+  .bar{width:70px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="brand">📈 Akcje – zadania krok po kroku<small>wycena · WACC · DCF · mnożniki</small></div>
+    <nav role="tablist" aria-label="Sekcje">
+      <button role="tab" data-tab="tasks" aria-selected="true">Zadania</button>
+      <button role="tab" data-tab="formulas" aria-selected="false">Wzory</button>
+      <button role="tab" data-tab="tables" aria-selected="false">Tablice</button>
+    </nav>
+    <div class="sp"></div>
+    <div class="prog" title="Zadania rozwiązane samodzielnie (kliknięcie odpowiedzi)"><span id="progtxt">0/31</span><div class="bar"><i id="progbar"></i></div></div>
+    <button class="iconbtn menu-m" id="menubtn" aria-label="Lista zadań">☰ Lista</button>
+    <button class="iconbtn" id="themebtn" aria-label="Zmień motyw">🌓</button>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* =============== POMOCNICZE =============== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const fmt=(x,d=2)=>{
+  if(!isFinite(x))return '—';
+  const neg=x<0&&Math.abs(x)>=Math.pow(10,-d)/2;
+  const s=Math.abs(x).toFixed(d);const [i,f]=s.split('.');
+  const ig=i.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+  return (neg?'−':'')+ig+(f?','+f:'');
+};
+const pc=(x,d=2)=>fmt(x*100,d)+'%';
+const fr=(n,d)=>`<span class="fr"><span class="n">${n}</span><span class="d">${d}</span></span>`;
+const eq=(...l)=>l.map(x=>`<div class="eq">${x}</div>`).join('');
+const note=s=>`<div class="note">${s}</div>`;
+const warn=s=>`<div class="warn">⚠️ ${s}</div>`;
+const res=s=>`<div class="result">${s}</div>`;
+const st=(t,b)=>({t,b});
+const ul=a=>'<ul>'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>';
+const tbl=(h,rows)=>`<div class="tblwrap"><table class="t"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</table></div>`;
+// czynniki z tablic
+const fvf=(r,n)=>Math.pow(1+r,n), pvf=(r,n)=>Math.pow(1+r,-n);
+const fva=(r,n)=>(Math.pow(1+r,n)-1)/r, pva=(r,n)=>(1-Math.pow(1+r,-n))/r;
+const L='ABCDEFGH';
+const safe=(f,d)=>{try{return f()}catch(e){return d}};
+
+/* =============== WZORY =============== */
+const FORMS={
+ g:{n:'Stopa wzrostu dywidendy',s:1,h:eq(`g = (1 − DPO)·ROE = f·ROE`),w:'DPO – wskaźnik wypłaty dywidendy, f = 1 − DPO – stopa zatrzymania zysku (retencji), ROE – rentowność kapitału własnego.'},
+ gordon:{n:'Model Gordona (wartość akcji) i DPO',s:1,h:eq(`P = ${fr('DIV<sub>1</sub>','r<sub>kw</sub> − g')}&emsp;,&emsp;DPO = ${fr('DIV','Z<sub>n</sub>')}`),w:'DIV₁ – dywidenda za rok, r_kw – wymagana stopa zwrotu (koszt kapitału własnego), g – stały wzrost, Z_n – zysk netto. Dywidenda „za ostatni rok” to DIV₀, więc DIV₁ = DIV₀·(1+g).'},
+ roc:{n:'ROC – zwrot z kapitału',s:1,h:eq(`ROC = ${fr('Eq','Eq + D')}·ROE + ${fr('D','Eq + D')}·r<sub>d</sub>·(1 − T)`),w:'Eq – kapitał własny, D – dług, r_d – koszt długu, T – stopa podatku.'},
+ capm:{n:'CAPM – koszt kapitału własnego',s:1,h:eq(`r<sub>kw</sub> = r<sub>f</sub> + β·(r<sub>m</sub> − r<sub>f</sub>)`),w:'r_f – stopa wolna od ryzyka, r_m – stopa zwrotu z portfela rynkowego, β – beta.'},
+ wacc:{n:'WACC',s:1,h:eq(`WACC = ${fr('Eq','Eq + D')}·r<sub>kw</sub> + ${fr('D','Eq + D')}·r<sub>d</sub>·(1 − T)`),w:'Wagi to udziały w (rynkowej) wartości kapitałów. Uwaga: „dług/kapitał własny = 50%” to D/Eq, nie D/(Eq+D)!'},
+ ev:{n:'Wartość firmy (EV) – DCF',s:1,h:eq(`EV = Σ<sub>t=1</sub><sup>n</sup> ${fr('FCF<sub>t</sub>','(1+WACC)<sup>t</sup>')} + ${fr('FCF<sub>t+1</sub>','(1+WACC)<sup>t</sup>·(WACC − g)')}`),w:'Pierwszy składnik: jawna prognoza przepływów, drugi: wartość rezydualna (po okresie prognozy) zdyskontowana o t okresów.'},
+ fcf:{n:'Wolny przepływ pieniężny FCF',s:1,h:eq(`FCF = EBIT·(1 − T) + AM − KO − CAPEX`),w:'AM – amortyzacja, KO – przyrost kapitału obrotowego (inwestycje w kapitał obrotowy), CAPEX – nakłady inwestycyjne.'},
+ eva:{n:'EVA',s:1,h:eq(`EVA = (ROC − WACC)·C<sub>0</sub>`),w:'C₀ – kapitał zainwestowany (własny + obcy). Równoważnie EVA = NOPAT − WACC·C₀.'},
+ ratios:{n:'Wskaźniki rentowności i rotacji',s:1,h:eq(`TAT = ${fr('S','A')}&emsp;ROE = ${fr('Z<sub>n</sub>','KW')}&emsp;ROA = ${fr('Z<sub>n</sub>','A')}`),w:'S – sprzedaż (przychody), A – aktywa, KW – kapitał własny, Z_n – zysk netto.'},
+ rkw_from_p:{n:'Koszt kapitału z ceny (przekształcony Gordon)',s:0,h:eq(`r<sub>kw</sub> = ${fr('DIV<sub>1</sub>','P')} + g`),w:'Wynika wprost z P = DIV₁/(r−g). Podatek spółki NIE wchodzi do kosztu kapitału własnego.'},
+ cum:{n:'Wartość akcji z prawem do dywidendy płatnej „teraz”',s:0,h:eq(`P = DIV<sub>0</sub> + ${fr('DIV<sub>0</sub>·(1+g)','r − g')} = ${fr('DIV<sub>0</sub>·(1+r)','r − g')}`),w:'Gdy dywidenda D₀ ma być wypłacona jutro, a nabywca ma do niej prawo – doliczamy ją do wartości przyszłych dywidend.'},
+ pe:{n:'P/E z modelu Gordona, P/BV',s:0,h:eq(`${fr('P<sub>0</sub>','EPS<sub>0</sub>')} = ${fr('DPO·(1+g)','r − g')}&emsp;,&emsp;${fr('P','KW')} = ROE·${fr('P','Z<sub>n</sub>')}`),w:'Trailing P/E (cena do zysku bieżącego). Forward P/E = DPO/(r−g). Z drugiej części: P/E = (P/BV)/ROE.'},
+ dupont:{n:'DuPont – ROE przez ROA i dźwignię',s:0,h:eq(`ROE = ROA·${fr('A','KW')} = ROA·(1 + ${fr('D','KW')})`),w:'D – zobowiązania ogółem. Rozszerzona: ROE = marża netto · TAT · (A/KW).'},
+ nopat:{n:'NOPAT i ROC',s:0,h:eq(`NOPAT = EBIT − podatek = EBIT·(1−T)&emsp;,&emsp;ROC = ${fr('NOPAT','C')}`),w:'Zysk operacyjny po opodatkowaniu (bez odsetek), do porównania z całym kapitałem.'},
+ mm:{n:'Modigliani–Miller z podatkami',s:0,h:eq(`WACC = r<sub>0</sub>·(1 − T·${fr('D','D+Eq')})&emsp;,&emsp;r<sub>0</sub> = koszt kapitału spółki bez długu`),w:'r₀ – koszt kapitału własnego spółki w 100% finansowanej kapitałem własnym.'},
+ ep:{n:'Wartość oczekiwana i stopa zwrotu z akcji',s:0,h:eq(`E(P<sub>1</sub>) = Σ p<sub>i</sub>·P<sub>i</sub>&emsp;,&emsp;r = ${fr('E(P<sub>1</sub>) + DIV − P<sub>0</sub>','P<sub>0</sub>')}`),w:'Stopa zwrotu = zysk kapitałowy + dywidenda, w relacji do ceny zakupu.'},
+ sharpe:{n:'Model jednowskaźnikowy Sharpe’a',s:0,h:eq(`σ<sub>A</sub><sup>2</sup> = β<sup>2</sup>·σ<sub>M</sub><sup>2</sup> + σ<sub>e</sub><sup>2</sup>`),w:'Ryzyko systematyczne (β²σ²_M) + specyficzne (wariancja składnika losowego). Odchylenie = pierwiastek z wariancji.'},
+ mult:{n:'Metoda mnożnikowa',s:0,h:eq(`P = EPS·(P/E)<sub>porównywalnych</sub>&emsp;,&emsp;EPS = ${fr('Z<sub>n</sub>','liczba akcji')}`),w:'Mnożnik: średnia (lub mediana) z spółek porównywalnych.'},
+ pref:{n:'Koszt akcji uprzywilejowanych / obligacji',s:0,h:eq(`r<sub>p</sub> = ${fr('DIV','P·(1 − k<sub>emisji</sub>)')}&emsp;;&emsp;obligacje: wpływ netto = Σ ${fr('kupon','(1+y)<sup>t</sup>')} + ${fr('nominał','(1+y)<sup>n</sup>')}`),w:'Dla stałej dywidendy (renta wieczysta). y – rentowność do wykupu, którą po opodatkowaniu mnożymy przez (1−T).'},
+ prob:{n:'Prawdopodobieństwo łączne',s:0,h:eq(`P(A ∩ B) = P(B)·P(A | B)`),w:'Najpierw „czy zysk wzrósł”, potem „czy mimo to nie było dywidendy”.'},
+ ps:{n:'Wskaźnik cena/sprzedaż',s:0,h:eq(`${fr('P','S')} = ${fr('P','EPS')}·${fr('EPS','S')} = P/E·marża netto`),w:'Gdy znamy cenę z modelu Gordona, dzielimy ją przez sprzedaż na akcję.'},
+ tables:{n:'Czynniki z tablic (PDF)',s:0,h:eq(`FV: (1+r)<sup>n</sup>&emsp;PV: (1+r)<sup>−n</sup>&emsp;FVA: ${fr('(1+r)<sup>n</sup> − 1','r')}&emsp;PVA: ${fr('1 − (1+r)<sup>−n</sup>','r')}`),w:'Cztery rodzaje tablic z Twojego PDF (wartość przyszła, bieżąca, przyszła renty, bieżąca renty).'}
+};
+
+/* =============== ZADANIA =============== */
+const T=[];
+const add=o=>T.push(o);
+
+/* ---------- MAKLER ---------- */
+add({id:'m1',grp:'Makler',label:'Makler 2022 (paźdz.) · pyt. 24',tags:['Teoria'],uses:['gordon'],
+ text:'<p>24. Model wyceny metodą zdyskontowanych dywidend (model Gordona) można zaliczyć do grona:</p>',
+ opts:['metod dochodowych;','metod mieszanych;','metod majątkowych;','metod bazujących na wycenie wartości goodwill.'],ans:0,
+ solve:()=>({steps:[
+  st('Przypomnij sobie podział metod wyceny spółek',ul([
+   '<b>majątkowe</b> – wartość księgowa, likwidacyjna, odtworzeniowa (liczy się to, co spółka ma),',
+   '<b>dochodowe</b> – DCF (FCFF, FCFE, CCF, APV), zdyskontowane dywidendy (DDM / Gordon), EVA – wartość = zdyskontowane przyszłe strumienie,',
+   '<b>porównawcze (mnożnikowe)</b> – P/E, P/BV, P/S, EV/EBITDA,',
+   '<b>mieszane</b> – łączą majątek z wartością dochodową (np. metody goodwill).'])),
+  st('Do której grupy należy Gordon?','Model Gordona: <i>wartość akcji = suma przyszłych dywidend zdyskontowanych wymaganą stopą zwrotu</i>.'+eq(`P = ${fr('DIV<sub>1</sub>','r − g')}`)+'Wycena opiera się wyłącznie na <b>przyszłych dochodach</b> (dywidendach) – to klasyczna metoda dochodowa.'),
+  st('Odrzuć pozostałe','B – metody mieszane łączą majątek i dochód; C – majątkowe patrzą na bilans; D – goodwill to odmiana metod mieszanych. Żadna z nich nie opisuje Gordona.')
+ ]}),trap:'Pytanie czysto teoretyczne – wystarczy zapamiętać: DDM / DCF / EVA = <b>metody dochodowe</b>.'});
+
+add({id:'m2',grp:'Makler',label:'Makler 2021 · pyt. 4',tags:['Teoria','DCF (FCF)'],uses:['fcf','ev'],
+ text:'<p>4. Odmiana wyceny metodą zdyskontowanych przepływów pieniężnych, będąca sumą przepływów pieniężnych należących do wierzycieli przedsiębiorstwa CFD (wynikających z zadłużenia oprocentowanego) oraz przepływów pieniężnych dla akcjonariuszy, nosi nazwę:</p>',
+ opts:['metody Equity Cash Flow;','metody Capital Cash Flow;','metody Adjusted Present Value;','metody Firm Cash Flow.'],ans:1,
+ solve:()=>({steps:[
+  st('Rozbij pytanie na dwa strumienie','Pytanie mówi o <b>sumie dwóch strumieni</b>:'+ul(['CFD – Cash Flow to Debt (dla wierzycieli: odsetki + spłaty kapitału),','CFE – Cash Flow to Equity (dla akcjonariuszy).'])+eq('CFD + CFE = <b>CCF</b> (Capital Cash Flow)')),
+  st('Porównaj z pozostałymi odmianami DCF',ul([
+   '<b>Equity Cash Flow (FCFE)</b> – tylko przepływy dla akcjonariuszy, dyskontowane kosztem kapitału własnego (→ A odpada),',
+   '<b>Firm Cash Flow (FCFF)</b> – przepływy dla wszystkich kapitałodawców <i>po</i> podatku operacyjnym, dyskontowane WACC (→ D odpada),',
+   '<b>APV</b> – wartość firmy bez długu + wartość tarczy podatkowej (→ C odpada),',
+   '<b>Capital Cash Flow</b> – CFD + CFE; tarcza podatkowa jest już zawarta w przepływach.'])),
+  st('Odpowiedź','To <b>Capital Cash Flow (CCF)</b> – odpowiedź B.')
+ ]}),trap:'Zapamiętaj: <b>CCF = CFD + CFE</b>, FCFF = przepływ „czysty” z działalności (WACC), FCFE = tylko dla właścicieli.'});
+
+add({id:'m3',grp:'Makler',label:'Makler 2023 · pyt. 55',tags:['Model Gordona'],uses:['gordon','g'],
+ text:'<p>55. Akcje spółki IP wyceniane są zgodnie z modelem Gordona na 1.200 PLN, przy wymaganej stopie zwrotu dla akcji tej spółki równej 10,21% oraz stopie zwrotu z kapitału własnego (ROE) równej 14,00%. Ile wynosi wskaźnik wypłaty dywidendy (ang. dividend payout ratio), jeżeli prognozowana na koniec roku dywidenda osiąga wartość 45,24 PLN?</p>',
+ opts:['0,32;','0,46;','0,48;','0,54.'],vals:[.32,.46,.48,.54],ans:3,fmtV:v=>fmt(v,2),
+ params:[{k:'P',l:'Cena akcji P',v:1200,u:'PLN'},{k:'r',l:'Wymagana stopa zwrotu',v:10.21,u:'%',pct:1},{k:'roe',l:'ROE',v:14,u:'%',pct:1},{k:'d1',l:'Dywidenda DIV₁',v:45.24,u:'PLN'}],
+ solve:p=>{const g=p.r-p.d1/p.P,f=g/p.roe,dpo=1-f;return {value:dpo,steps:[
+  st('Dane i szukane',ul([`P = ${fmt(p.P)} zł, r<sub>kw</sub> = ${pc(p.r)}, ROE = ${pc(p.roe)}, DIV<sub>1</sub> = ${fmt(p.d1)} zł (dywidenda „na koniec roku” = za rok)`,'Szukamy <b>DPO</b> (wskaźnika wypłaty dywidendy).'])+note('Plan: z Gordona wyznaczamy <b>g</b>, a z g = (1−DPO)·ROE wyznaczamy DPO.')),
+  st('Z modelu Gordona wyznacz g',`Wzór: P = DIV<sub>1</sub>/(r − g). Przekształcamy: r − g = DIV<sub>1</sub>/P.`+eq(`r − g = ${fr(fmt(p.d1),fmt(p.P))} = ${pc(p.d1/p.P,4)}`,`g = r − ${pc(p.d1/p.P,4)} = ${pc(p.r,2)} − ${pc(p.d1/p.P,4)} = <b>${pc(g,4)}</b>`)),
+  st('Z g = (1 − DPO)·ROE wyznacz DPO',`Najpierw stopa zatrzymania zysku f = g/ROE:`+eq(`f = 1 − DPO = ${fr('g','ROE')} = ${fr(pc(g,4),pc(p.roe,2))} = ${fmt(f,4)}`,`DPO = 1 − f = 1 − ${fmt(f,4)} = <b>${fmt(dpo,4)}</b>`)),
+  st('Sprawdzenie (opcjonalnie)',`Jeśli DPO = ${fmt(dpo,2)}, to g = (1 − ${fmt(dpo,2)})·${pc(p.roe,0)} = ${pc((1-dpo)*p.roe,2)} – zgadza się z wartością z kroku 2.`)
+ ]}},trap:'Nie pomyl <b>DPO</b> (część zysku wypłacona) z <b>f</b> = 1−DPO (część zatrzymana). Dla g potrzebna jest f.'});
+
+add({id:'m4',grp:'Makler',label:'Makler 2023 · pyt. 70',tags:['WACC i CAPM','EVA / ROE'],uses:['roc'],
+ text:'<p>70. W spółce SWKW stopa zwrotu z kapitału własnego (ROE) wynosi 30%, zwrot z kapitału (ROC) wynosi 10%, wartość księgowa kapitału obcego wynosi 70.000 PLN, wartość księgowa kapitału własnego wynosi 30.000 PLN a stopa podatku dochodowego 10%. Przy powyższych danych, koszt kapitału obcego jest równy w zaokrągleniu:</p>',
+ opts:['1%;','2%;','3%;','4%.'],vals:[.01,.02,.03,.04],ans:1,fmtV:v=>pc(v,2),
+ params:[{k:'roe',l:'ROE',v:30,u:'%',pct:1},{k:'roc',l:'ROC',v:10,u:'%',pct:1},{k:'D',l:'Kapitał obcy D',v:70000,u:'PLN'},{k:'E',l:'Kapitał własny Eq',v:30000,u:'PLN'},{k:'T',l:'Stopa podatku T',v:10,u:'%',pct:1}],
+ solve:p=>{const V=p.D+p.E,we=p.E/V,wd=p.D/V,part=we*p.roe,rest=p.roc-part,rd=rest/(wd*(1-p.T));return {value:rd,steps:[
+  st('Zapisz wzór na ROC z kartki',eq(`ROC = ${fr('Eq','Eq + D')}·ROE + ${fr('D','Eq + D')}·r<sub>d</sub>·(1 − T)`)+'Jedyną niewiadomą jest <b>r<sub>d</sub></b> (koszt długu) – to równanie pierwszego stopnia.'),
+  st('Policz wagi kapitałów',eq(`Eq + D = ${fmt(p.E,0)} + ${fmt(p.D,0)} = ${fmt(V,0)}`,`${fr('Eq','Eq+D')} = ${fmt(we,2)}&emsp;${fr('D','Eq+D')} = ${fmt(wd,2)}`)),
+  st('Wstaw dane i wyznacz człon długu',eq(`${pc(p.roc,2)} = ${fmt(we,2)}·${pc(p.roe,0)} + ${fmt(wd,2)}·r<sub>d</sub>·(1 − ${fmt(p.T,2)})`,`${pc(p.roc,2)} = ${pc(part,2)} + ${fmt(wd*(1-p.T),3)}·r<sub>d</sub>`,`${fmt(wd*(1-p.T),3)}·r<sub>d</sub> = ${pc(p.roc,2)} − ${pc(part,2)} = ${pc(rest,2)}`)),
+  st('Wyznacz r<sub>d</sub>',eq(`r<sub>d</sub> = ${fr(pc(rest,2),fmt(wd*(1-p.T),3))} = <b>${pc(rd,2)}</b> ≈ ${pc(Math.round(rd*100)/100,0)}`))
+ ]}},trap:'Podatek (1−T) mnożymy tylko przy koszcie <b>długu</b> – tarcza podatkowa. Kapitał własny jej nie ma.'});
+
+add({id:'m5',grp:'Makler',label:'Makler 2023 · pyt. 85',tags:['WACC i CAPM'],uses:['wacc','capm'],
+ text:'<p>85. Ile wynosi współczynnik Beta spółki RFG, jeżeli rynkowa wartość długu to 171 PLN, rynkowa wartość kapitału własnego to 279 PLN, koszt długu kształtuje się na poziomie 2,50%, stopa wolna od ryzyka równa jest 1,32%, zwrot z portfela rynkowego to 10,44%, średni ważony koszt kapitału tej spółki równy jest 10,06%, a stawka podatku dochodowego od zysków spółek równa jest 20%?</p>',
+ opts:['1,15;','1,25;','1,4;','1,5.'],vals:[1.15,1.25,1.4,1.5],ans:3,fmtV:v=>fmt(v,2),
+ params:[{k:'D',l:'Dług D',v:171,u:'PLN'},{k:'E',l:'Kapitał własny Eq',v:279,u:'PLN'},{k:'rd',l:'Koszt długu r_d',v:2.5,u:'%',pct:1},{k:'rf',l:'Stopa wolna od ryzyka',v:1.32,u:'%',pct:1},{k:'rm',l:'Zwrot z rynku r_m',v:10.44,u:'%',pct:1},{k:'w',l:'WACC',v:10.06,u:'%',pct:1},{k:'T',l:'Podatek T',v:20,u:'%',pct:1}],
+ solve:p=>{const V=p.D+p.E,we=p.E/V,wd=p.D/V,dpart=wd*p.rd*(1-p.T),rke=(p.w-dpart)/we,beta=(rke-p.rf)/(p.rm-p.rf);return {value:beta,steps:[
+  st('Plan','Mamy WACC, więc najpierw z WACC wyznaczymy <b>koszt kapitału własnego r<sub>kw</sub></b>, a potem z CAPM – betę.'),
+  st('Wagi kapitałów',eq(`V = Eq + D = ${fmt(p.E,0)} + ${fmt(p.D,0)} = ${fmt(V,0)}`,`${fr('Eq','V')} = ${fmt(we,4)}&emsp;${fr('D','V')} = ${fmt(wd,4)}`)),
+  st('Z WACC wyznacz r<sub>kw</sub>',eq(`${pc(p.w,2)} = ${fmt(we,4)}·r<sub>kw</sub> + ${fmt(wd,4)}·${pc(p.rd,2)}·(1 − ${fmt(p.T,2)})`,`${pc(p.w,2)} = ${fmt(we,4)}·r<sub>kw</sub> + ${pc(dpart,4)}`,`r<sub>kw</sub> = ${fr(pc(p.w-dpart,4),fmt(we,4))} = <b>${pc(rke,2)}</b>`)),
+  st('Z CAPM wyznacz β',eq(`r<sub>kw</sub> = r<sub>f</sub> + β·(r<sub>m</sub> − r<sub>f</sub>)`,`β = ${fr('r<sub>kw</sub> − r<sub>f</sub>','r<sub>m</sub> − r<sub>f</sub>')} = ${fr(pc(rke-p.rf,2),pc(p.rm-p.rf,2))} = <b>${fmt(beta,2)}</b>`))
+ ]}},trap:'Zadanie jest „odwrócone” – WACC jest dany, a szukamy kosztu kapitału własnego i bety. Rozwiązuj od WACC „do tyłu”.'});
+
+add({id:'m6',grp:'Makler',label:'Makler 2023 · pyt. 92',tags:['Model Gordona','Mnożniki'],uses:['gordon','g','pe'],
+ text:'<p>92. Jeżeli długookresowa stopa zysków zatrzymanych (ang. retention rate of earnings) spółki UT wynosi 68%, wsteczny wskaźnik cena/zysk (ang. trailing P/E, liczony jako bieżąca cena akcji do bieżącego zysku na akcję) tej spółki równej jest 3,2, a oczekiwana stopa wzrostu dywidendy wynosi 2,80%, to wymagana stopa zwrotu z akcji tej spółki kształtuje się na poziomie:</p>',
+ opts:['13,08%;','14,65%;','24,65%;','32,81%.'],vals:[.1308,.1465,.2465,.3281],ans:0,fmtV:v=>pc(v,2),
+ params:[{k:'f',l:'Stopa zatrzymania zysku f',v:68,u:'%',pct:1},{k:'pe',l:'Trailing P/E',v:3.2,u:''},{k:'g',l:'Wzrost dywidendy g',v:2.8,u:'%',pct:1}],
+ solve:p=>{const dpo=1-p.f,r=p.g+dpo*(1+p.g)/p.pe;return {value:r,steps:[
+  st('Dane i szukane',ul([`f = ${pc(p.f,0)} ⇒ <b>DPO = 1 − f = ${fmt(dpo,2)}</b>`,`trailing P/E = P<sub>0</sub>/EPS<sub>0</sub> = ${fmt(p.pe,1)}`,`g = ${pc(p.g,2)}`,'Szukamy r (wymagana stopa zwrotu).'])),
+  st('Wyprowadź wzór na trailing P/E',`Gordon: P<sub>0</sub> = DIV<sub>1</sub>/(r − g), przy czym DIV<sub>1</sub> = DPO·EPS<sub>0</sub>·(1+g) (dywidenda z <i>bieżącego</i> zysku, urosła o g).`+eq(`${fr('P<sub>0</sub>','EPS<sub>0</sub>')} = ${fr('DPO·(1+g)','r − g')}`)),
+  st('Wstaw dane i rozwiąż względem r',eq(`${fmt(p.pe,1)} = ${fr(`${fmt(dpo,2)}·${fmt(1+p.g,3)}`,'r − '+fmt(p.g,3))}`,`r − ${fmt(p.g,3)} = ${fr(fmt(dpo*(1+p.g),5),fmt(p.pe,1))} = ${fmt(dpo*(1+p.g)/p.pe,4)}`,`r = ${fmt(dpo*(1+p.g)/p.pe,4)} + ${fmt(p.g,3)} = <b>${pc(r,2)}</b>`)),
+ ]}},trap:'Jeśli użyjesz P/E „w przód” (bez członu 1+g) wyjdzie 12,80% – nie ma takiej odpowiedzi. Słowo <b>„trailing”</b> oznacza zysk bieżący, stąd (1+g).'});
+
+add({id:'m7',grp:'Makler',label:'Makler 2023 · pyt. 97',tags:['WACC i CAPM'],uses:['wacc','capm'],
+ text:'<p>97. Ile wynosi zwrot z portfela rynkowego, jeżeli rynkowa wartość długu spółki TGT to 245 PLN, rynkowa wartość kapitału własnego to 455 PLN, koszt długu kształtuje się na poziomie 6,25%, stopa wolna od ryzyka równa jest 3,84%, współczynnik Beta spółki TGT to 1,06, średni ważony koszt kapitału tej spółki równy jest 8,38%, a stawka podatku dochodowego od zysków spółek równa jest 20%?</p>',
+ opts:['8,62%;','9,84%;','10,20%;','11,64%.'],vals:[.0862,.0984,.102,.1164],ans:1,fmtV:v=>pc(v,2),
+ params:[{k:'D',l:'Dług D',v:245,u:'PLN'},{k:'E',l:'Kapitał własny Eq',v:455,u:'PLN'},{k:'rd',l:'Koszt długu',v:6.25,u:'%',pct:1},{k:'rf',l:'Stopa wolna od ryzyka',v:3.84,u:'%',pct:1},{k:'beta',l:'Beta',v:1.06,u:''},{k:'w',l:'WACC',v:8.38,u:'%',pct:1},{k:'T',l:'Podatek T',v:20,u:'%',pct:1}],
+ solve:p=>{const V=p.D+p.E,we=p.E/V,wd=p.D/V,dpart=wd*p.rd*(1-p.T),rke=(p.w-dpart)/we,rm=p.rf+(rke-p.rf)/p.beta;return {value:rm,steps:[
+  st('Plan','Ten sam schemat co w poprzednim zadaniu: z <b>WACC</b> wyznacz r<sub>kw</sub>, potem z <b>CAPM</b> wyznacz r<sub>m</sub>.'),
+  st('Wagi',eq(`V = ${fmt(p.E,0)} + ${fmt(p.D,0)} = ${fmt(V,0)}`,`${fr('Eq','V')} = ${fmt(we,4)}&emsp;${fr('D','V')} = ${fmt(wd,4)}`)),
+  st('Z WACC wyznacz r<sub>kw</sub>',eq(`${pc(p.w,2)} = ${fmt(we,4)}·r<sub>kw</sub> + ${fmt(wd,4)}·${pc(p.rd,2)}·(1 − ${fmt(p.T,2)})`,`${fmt(wd,4)}·${pc(p.rd,2)}·${fmt(1-p.T,2)} = ${pc(dpart,4)}`,`r<sub>kw</sub> = ${fr(pc(p.w-dpart,4),fmt(we,4))} = <b>${pc(rke,2)}</b>`)),
+  st('Z CAPM wyznacz r<sub>m</sub>',eq(`r<sub>kw</sub> = r<sub>f</sub> + β·(r<sub>m</sub> − r<sub>f</sub>)`,`r<sub>m</sub> − r<sub>f</sub> = ${fr('r<sub>kw</sub> − r<sub>f</sub>','β')} = ${fr(pc(rke-p.rf,2),fmt(p.beta,2))} = ${pc((rke-p.rf)/p.beta,2)}`,`r<sub>m</sub> = ${pc(p.rf,2)} + ${pc((rke-p.rf)/p.beta,2)} = <b>${pc(rm,2)}</b>`))
+ ]}},trap:'Premia za ryzyko rynkowe to (r<sub>m</sub> − r<sub>f</sub>); pamiętaj dodać na końcu r<sub>f</sub>.'});
+
+/* ---------- EGZAMIN DORADCA (bez roku) ---------- */
+add({id:'e1',grp:'Egzamin Doradca',label:'Doradca · zad. 73',tags:['Model Gordona'],uses:['cum','gordon'],
+ text:'<p>73. Spółka X jutro wypłaci dywidendę na akcję w wysokości 10 zł. Perspektywy branży, w której ona działa są jednak pesymistyczne i zgodnie z oczekiwaniami inwestorów dywidenda będzie w przyszłych okresach maleć w stałym tempie 5% rocznie (do nieskończoności). Wymagana stopa zwrotu z akcji wynosi 10%. Na podstawie powyższych danych (z dokładnością do 1 zł), ile wynosi dzisiejsza wartość akcji spółki X, jeżeli jej nabywcy przysługuje prawo do jutrzejszej dywidendy.</p>',
+ opts:['67 zł,','73 zł,','77 zł,','200 zł.'],vals:[67,73,77,200],ans:1,fmtV:v=>fmt(v,2)+' zł',
+ params:[{k:'D',l:'Dywidenda jutro',v:10,u:'zł'},{k:'g',l:'Wzrost g (ujemny = spadek)',v:-5,u:'%',pct:1},{k:'r',l:'Wymagana stopa zwrotu',v:10,u:'%',pct:1}],
+ solve:p=>{const d2=p.D*(1+p.g),pex=d2/(p.r-p.g),val=p.D+pex;return {value:val,steps:[
+  st('Zrozum układ czasowy',ul([`Dywidenda ${fmt(p.D,0)} zł wypłacana jest <b>jutro</b> – praktycznie „dziś” (to nasza D<sub>0</sub>), a nabywca ma do niej prawo.`,`Kolejne dywidendy maleją: g = ${pc(p.g,0)} (stopa ujemna!).`,'Wartość akcji = dywidenda jutrzejsza + wartość wszystkich kolejnych dywidend.'])),
+  st('Wartość kolejnych dywidend (po wypłacie jutrzejszej)',`Pierwsza z kolejnych dywidend (za rok) to:`+eq(`DIV<sub>2</sub> = ${fmt(p.D,0)}·(1 + (${pc(p.g,0)})) = ${fmt(d2,2)} zł`)+`Model Gordona dla ujemnego wzrostu (r − g = ${pc(p.r,0)} − (${pc(p.g,0)}) = ${pc(p.r-p.g,0)}):`+eq(`P<sub>ex</sub> = ${fr(fmt(d2,2),pc(p.r-p.g,0))} = ${fmt(pex,2)} zł`)),
+  st('Dodaj dywidendę jutrzejszą',eq(`P = ${fmt(p.D,0)} + ${fmt(pex,2)} = <b>${fmt(val,2)} zł</b> ≈ ${fmt(Math.round(val),0)} zł`)+note(`Skrót: P = D<sub>0</sub>·(1+r)/(r−g) = ${fmt(p.D,0)}·${fmt(1+p.r,2)}/${fmt(p.r-p.g,2)} = ${fmt(p.D*(1+p.r)/(p.r-p.g),2)}`))
+ ]}},trap:'Pułapki: <b>67 zł</b> = 10/(0,10+0,05) – pominięta dywidenda jutrzejsza i błędnie potraktowana jako DIV₁; <b>77 zł</b> = 10 + 10/0,15 – następna dywidenda to 9,5 (spadek 5%), a nie 10.'});
+
+add({id:'e2',grp:'Egzamin Doradca',label:'Doradca · zad. 89',tags:['Model Gordona','WACC i CAPM'],uses:['capm','gordon'],
+ text:'<p>89. Za rok od dnia dzisiejszego spółka wypłaci dywidendę na akcję w wysokości 2 zł, przy czym w przyszłości spodziewany jest wzrost tej dywidendy w stałym tempie 10% rocznie. Wartość współczynnika Beta akcji spółki wynosi 1,2; stopa zwrotu z aktywów wolnych od ryzyka 10%, zaś oczekiwana stopa zwrotu z portfela rynkowego 20%. Ile wynosi wartość akcji spółki, jeżeli miałbyś ją oszacować na podstawie powyższych danych?</p>',
+ opts:['9,1','12,0','16,7','100,0'],vals:[9.1,12,16.7,100],ans:2,fmtV:v=>fmt(v,2),
+ params:[{k:'D1',l:'DIV₁',v:2,u:'zł'},{k:'g',l:'Wzrost g',v:10,u:'%',pct:1},{k:'beta',l:'Beta',v:1.2,u:''},{k:'rf',l:'r_f',v:10,u:'%',pct:1},{k:'rm',l:'r_m',v:20,u:'%',pct:1}],
+ solve:p=>{const r=p.rf+p.beta*(p.rm-p.rf),P=p.D1/(r-p.g);return {value:P,steps:[
+  st('Plan','Brak podanego kosztu kapitału – obliczamy go z <b>CAPM</b>, a potem wstawiamy do <b>Gordona</b>.'),
+  st('Koszt kapitału własnego z CAPM',eq(`r<sub>kw</sub> = r<sub>f</sub> + β·(r<sub>m</sub> − r<sub>f</sub>) = ${pc(p.rf,0)} + ${fmt(p.beta,1)}·(${pc(p.rm,0)} − ${pc(p.rf,0)}) = <b>${pc(r,1)}</b>`)),
+  st('Wycena Gordona',`Dywidenda za rok (DIV<sub>1</sub>) = ${fmt(p.D1,0)} zł – <b>nie</b> mnożymy jej przez (1+g).`+eq(`P = ${fr('DIV<sub>1</sub>','r<sub>kw</sub> − g')} = ${fr(fmt(p.D1,0),`${pc(r,0)} − ${pc(p.g,0)}`)} = ${fr(fmt(p.D1,0),pc(r-p.g,0))} = <b>${fmt(P,2)} zł</b>`))
+ ]}},trap:'Dywidenda „za rok” to już DIV₁. Mnożenie przez (1+g) byłoby błędem (wyszłoby 18,33 zł).'});
+
+add({id:'e3',grp:'Egzamin Doradca',label:'Doradca · zad. 22',tags:['Model Gordona'],uses:['rkw_from_p','gordon'],
+ text:'<p>22. Cena akcji spółki X wynosi w chwili obecnej 10 zł. Zgodnie z przewidywaniami analityków za rok od chwili obecnej spółka wypłaci dywidendę na akcję w wysokości 2 zł. W przyszłości spodziewany jest stały wzrost dywidendy w tempie 10 % rocznie. Stopa opodatkowania dochodów spółki wynosi 32 %. Na podstawie powyższych danych określ, ile wynosi koszt kapitału własnego tej spółki.</p>',
+ opts:['20,4 %','30,0 %','39,6 %','40,0 %'],vals:[.204,.30,.396,.40],ans:1,fmtV:v=>pc(v,1),
+ params:[{k:'P',l:'Cena akcji',v:10,u:'zł'},{k:'D1',l:'DIV₁',v:2,u:'zł'},{k:'g',l:'Wzrost g',v:10,u:'%',pct:1},{k:'T',l:'Podatek (nieistotny)',v:32,u:'%',pct:1}],
+ solve:p=>{const r=p.D1/p.P+p.g;return {value:r,steps:[
+  st('Wyznacz, co jest dane','Znamy cenę, dywidendę za rok i g – brakuje <b>r<sub>kw</sub></b>. Przekształcamy wzór Gordona.'),
+  st('Przekształć P = DIV₁/(r − g)',eq(`P = ${fr('DIV<sub>1</sub>','r − g')}&emsp;⇒&emsp;r − g = ${fr('DIV<sub>1</sub>','P')}&emsp;⇒&emsp;r = ${fr('DIV<sub>1</sub>','P')} + g`)),
+  st('Podstaw liczby',eq(`r<sub>kw</sub> = ${fr(fmt(p.D1,0),fmt(p.P,0))} + ${pc(p.g,0)} = ${pc(p.D1/p.P,0)} + ${pc(p.g,0)} = <b>${pc(r,0)}</b>`)),
+  st('Co z podatkiem 32%?','Stopa podatku jest <b>zbędną daną</b> – tarcza podatkowa dotyczy kosztu <i>długu</i>. Koszt kapitału własnego jest „po podatku” z definicji.')
+ ]}},trap:'Pomysł „(1−T)” przy kapitale własnym to klasyczny błąd: 30%·(1−0,32)=20,4% (odpowiedź A) lub 30%/0,68=44% – oba złe.'});
+
+add({id:'e4',grp:'Egzamin Doradca',label:'Doradca · zad. 97 (WACC)',tags:['WACC i CAPM','Model Gordona'],uses:['wacc','rkw_from_p','gordon'],
+ text:'<p>97. Korzystając z poniższych danych oblicz średni ważony koszt kapitału spółki (WACC).<br>- prognozowana wysokość dywidendy: 3 zł na akcję,<br>- roczna stopa wzrostu dywidendy: 5%,<br>- aktualna cena akcji: 25 zł,<br>- stosunek długu do kapitału własnego: 50%,<br>- stopa podatku dochodowego: 19%,<br>- koszt długu przed opodatkowaniem: 8%.</p>',
+ opts:['11,2%;','13,5%;','14,7%;','16,2%;'],vals:[.112,.135,.147,.162],ans:1,fmtV:v=>pc(v,2),
+ params:[{k:'D1',l:'DIV₁',v:3,u:'zł'},{k:'g',l:'g',v:5,u:'%',pct:1},{k:'P',l:'Cena',v:25,u:'zł'},{k:'de',l:'Dług / kapitał własny',v:50,u:'%',pct:1},{k:'T',l:'Podatek T',v:19,u:'%',pct:1},{k:'rd',l:'Koszt długu',v:8,u:'%',pct:1}],
+ solve:p=>{const rke=p.D1/p.P+p.g,we=1/(1+p.de),wd=p.de/(1+p.de),rdn=p.rd*(1-p.T),w=we*rke+wd*rdn;return {value:w,steps:[
+  st('Plan','WACC potrzebuje: kosztu kapitału własnego (z Gordona), kosztu długu po podatku i wag.'),
+  st('Koszt kapitału własnego z Gordona',`„Prognozowana dywidenda” to DIV<sub>1</sub>.`+eq(`r<sub>kw</sub> = ${fr('DIV<sub>1</sub>','P')} + g = ${fr(fmt(p.D1,0),fmt(p.P,0))} + ${pc(p.g,0)} = <b>${pc(rke,1)}</b>`)),
+  st('Uwaga na wagi: dane jest D/Eq, a nie D/V!',`D/Eq = ${pc(p.de,0)}, czyli D = ${fmt(p.de,1)}·Eq. Przyjmij Eq = 1, wtedy D = ${fmt(p.de,1)}, V = ${fmt(1+p.de,1)}.`+eq(`${fr('Eq','V')} = ${fr('1',fmt(1+p.de,1))} = ${fmt(we,4)}&emsp;${fr('D','V')} = ${fr(fmt(p.de,1),fmt(1+p.de,1))} = ${fmt(wd,4)}`)),
+  st('Koszt długu po podatku',eq(`r<sub>d</sub>·(1 − T) = ${pc(p.rd,0)}·(1 − ${fmt(p.T,2)}) = ${pc(rdn,2)}`)),
+  st('Złóż WACC',eq(`WACC = ${fmt(we,4)}·${pc(rke,0)} + ${fmt(wd,4)}·${pc(rdn,2)} = ${pc(we*rke,3)} + ${pc(wd*rdn,3)} = <b>${pc(w,2)}</b>`))
+ ]}},trap:'Błąd z wagami (D/V = 50%) daje WACC = 11,74% – nie ma takiej odpowiedzi. Zawsze sprawdź, czy dane „50%” to D/Eq czy D/V.'});
+
+add({id:'e5',grp:'Egzamin Doradca',label:'Doradca · zad. 65',tags:['DCF (FCF)','WACC i CAPM'],uses:['capm','wacc','ev'],
+ text:'<p>65. Wolne przepływy gotówkowe generowane przez spółkę ABC w ciągu następnych trzech lat będą następujące: 30 mln zł od dzisiaj za rok, 35 mln zł za dwa lata i 40 mln zł za 3 lata. Począwszy od 4 roku wolne przepływy gotówkowe będą rosły o 3% rocznie, w nieskończoność. Spółka ABC finansuje się w 70% kapitałem własnym i w 30% długiem. Stopa podatku dochodowego wynosi 32%, zaś beta firmy 0,8. Stopa zwrotu z portfela rynkowego wynosi 15%, stopa wolna od ryzyka 5%, zaś koszt długu, którym finansuje się spółka wynosi 8%. Wartość rynkowa firmy wynosi około:</p>',
+ opts:['396 mln zł,','426 mln zł,','451 mln zł,','478 mln zł.'],vals:[396,426,451,478],ans:3,fmtV:v=>fmt(v,1)+' mln zł',
+ params:[{k:'f1',l:'FCF rok 1',v:30,u:'mln'},{k:'f2',l:'FCF rok 2',v:35,u:'mln'},{k:'f3',l:'FCF rok 3',v:40,u:'mln'},{k:'g',l:'Wzrost od roku 4',v:3,u:'%',pct:1},{k:'we',l:'Udział kapitału własnego',v:70,u:'%',pct:1},{k:'T',l:'Podatek T',v:32,u:'%',pct:1},{k:'beta',l:'Beta',v:0.8,u:''},{k:'rm',l:'r_m',v:15,u:'%',pct:1},{k:'rf',l:'r_f',v:5,u:'%',pct:1},{k:'rd',l:'Koszt długu',v:8,u:'%',pct:1}],
+ solve:p=>{const rke=p.rf+p.beta*(p.rm-p.rf),wd=1-p.we,w=p.we*rke+wd*p.rd*(1-p.T),f4=p.f3*(1+p.g),tv=f4/(w-p.g),fl=[p.f1,p.f2,p.f3],pv=fl.map((f,i)=>f*pvf(w,i+1)),pvtv=tv*pvf(w,3),ev=pv[0]+pv[1]+pv[2]+pvtv;return {value:ev,steps:[
+  st('Plan',ul(['Koszt kapitału własnego z <b>CAPM</b>,','<b>WACC</b> (dyskonto dla przepływów całej firmy – FCFF),','przepływy z lat 1–3 zdyskontuj osobno,','od roku 4 – <b>wartość rezydualna</b> wg Gordona (stały wzrost), zdyskontowana o 3 lata.'])),
+  st('CAPM',eq(`r<sub>kw</sub> = ${pc(p.rf,0)} + ${fmt(p.beta,1)}·(${pc(p.rm,0)} − ${pc(p.rf,0)}) = <b>${pc(rke,0)}</b>`)),
+  st('WACC',eq(`WACC = ${fmt(p.we,2)}·${pc(rke,0)} + ${fmt(wd,2)}·${pc(p.rd,0)}·(1 − ${fmt(p.T,2)})`,`WACC = ${pc(p.we*rke,3)} + ${pc(wd*p.rd*(1-p.T),3)} = <b>${pc(w,3)}</b>`)),
+  st('Wartość rezydualna na koniec roku 3',`Pierwszy przepływ po okresie prognozy: FCF<sub>4</sub> = FCF<sub>3</sub>·(1+g) = ${fmt(p.f3,0)}·${fmt(1+p.g,2)} = ${fmt(f4,2)} mln.`+eq(`TV<sub>3</sub> = ${fr('FCF<sub>4</sub>','WACC − g')} = ${fr(fmt(f4,2),`${pc(w,3)} − ${pc(p.g,0)}`)} = <b>${fmt(tv,2)} mln</b>`)),
+  st('Dyskontowanie',tbl(['Rok','Przepływ','Czynnik (1+WACC)<sup>−t</sup>','Wartość bieżąca'],[[1,fmt(p.f1,2),fmt(pvf(w,1),4),fmt(pv[0],2)],[2,fmt(p.f2,2),fmt(pvf(w,2),4),fmt(pv[1],2)],[3,fmt(p.f3,2),fmt(pvf(w,3),4),fmt(pv[2],2)],['3 (TV)',fmt(tv,2),fmt(pvf(w,3),4),fmt(pvtv,2)]])+eq(`EV = ${fmt(pv[0],2)} + ${fmt(pv[1],2)} + ${fmt(pv[2],2)} + ${fmt(pvtv,2)} = <b>${fmt(ev,1)} mln zł</b>`)),
+  st('Uwaga praktyczna',warn(`WACC = ${pc(w,3)} nie ma w tablicach (są tylko całe procenty). Wynik mocno zależy od WACC (przy 11% wyszłoby 461 mln), więc tu licz na kalkulatorze bez zaokrągleń. Wartość rezydualna to ~${fmt(pvtv/ev*100,0)}% całej wartości.`))
+ ]}},trap:'Wartość rezydualną dyskontuj o <b>3</b> lata (nie o 4) – wzór z kartki: FCF<sub>t+1</sub>/((1+WACC)<sup>t</sup>·(WACC−g)) z t=3.'});
+
+add({id:'e6',grp:'Egzamin Doradca',label:'Doradca · zad. 95',tags:['DCF (FCF)','WACC i CAPM'],uses:['fcf','wacc','ev'],
+ text:'<p>95. Spółka ABC wypracowała w ubiegłym roku 80 mln zł przychodów oraz EBIT na poziomie 30 mln zł. Nakłady kapitałowe wyniosły 20 mln zł, przy amortyzacji na poziomie 15 mln zł, zaś dodatkowe nakłady na kapitał obrotowy wyniosły 6 mln zł. Spółka działa obecnie finansując swoją działalność w 25% długiem. Przy założeniu stopy podatku dochodowego na poziomie 40%, oblicz przybliżoną wartość firmy, jeżeli wymagana przez akcjonariuszy stopa zwrotu wynosi 15% rocznie, koszt długu wynosi 8% rocznie, a stopa wzrostu wolnego przepływu gotówkowego w firmie wynosi 5%.</p>',
+ opts:['74 mln zł;','85 mln zł;','99 mln zł;','110 mln zł;'],vals:[74,85,99,110],ans:2,fmtV:v=>fmt(v,1)+' mln zł',
+ params:[{k:'ebit',l:'EBIT',v:30,u:'mln'},{k:'T',l:'Podatek T',v:40,u:'%',pct:1},{k:'am',l:'Amortyzacja',v:15,u:'mln'},{k:'ko',l:'Przyrost kap. obrotowego',v:6,u:'mln'},{k:'capex',l:'CAPEX',v:20,u:'mln'},{k:'wd',l:'Udział długu',v:25,u:'%',pct:1},{k:'re',l:'Koszt kap. własnego',v:15,u:'%',pct:1},{k:'rd',l:'Koszt długu',v:8,u:'%',pct:1},{k:'g',l:'Wzrost FCF',v:5,u:'%',pct:1}],
+ solve:p=>{const nopat=p.ebit*(1-p.T),fcf=nopat+p.am-p.ko-p.capex,w=(1-p.wd)*p.re+p.wd*p.rd*(1-p.T),f1=fcf*(1+p.g),ev=f1/(w-p.g);return {value:ev,steps:[
+  st('Plan','Liczymy FCF za <b>ubiegły rok</b>, WACC, potem wartość z Gordona (stały wzrost 5%). Przychody (80 mln) są daną zbędną.'),
+  st('FCF z kartki',eq(`FCF = EBIT·(1 − T) + AM − KO − CAPEX`,`FCF = ${fmt(p.ebit,0)}·(1 − ${fmt(p.T,2)}) + ${fmt(p.am,0)} − ${fmt(p.ko,0)} − ${fmt(p.capex,0)}`,`FCF = ${fmt(nopat,1)} + ${fmt(p.am,0)} − ${fmt(p.ko,0)} − ${fmt(p.capex,0)} = <b>${fmt(fcf,1)} mln zł</b>`)),
+  st('WACC',`Udział długu 25% ⇒ udział kapitału własnego 75%.`+eq(`WACC = ${fmt(1-p.wd,2)}·${pc(p.re,0)} + ${fmt(p.wd,2)}·${pc(p.rd,0)}·(1 − ${fmt(p.T,2)}) = ${pc((1-p.wd)*p.re,2)} + ${pc(p.wd*p.rd*(1-p.T),2)} = <b>${pc(w,2)}</b>`)),
+  st('Wartość firmy',`FCF jest z roku ubiegłego (=FCF<sub>0</sub>) – przepływ za rok: FCF<sub>1</sub> = FCF<sub>0</sub>·(1+g) = ${fmt(fcf,1)}·${fmt(1+p.g,2)} = ${fmt(f1,2)}.`+eq(`EV = ${fr('FCF<sub>1</sub>','WACC − g')} = ${fr(fmt(f1,2),`${pc(w,2)} − ${pc(p.g,0)}`)} = ${fr(fmt(f1,2),pc(w-p.g,2))} = <b>${fmt(ev,1)} mln zł</b>`))
+ ]}},trap:'Bez przemnożenia przez (1+g) wyjdzie 94 mln (brak takiej odpowiedzi). Kolejna pułapka: pominięcie KO (przyrostu kapitału obrotowego).'});
+
+add({id:'e7',grp:'Egzamin Doradca',label:'Doradca · zad. 58',tags:['DCF (FCF)','Model Gordona'],uses:['gordon'],
+ text:'<p>58. Oczekiwany za rok wolny przepływ gotówkowy dla akcjonariuszy (free cash flow to equity) w spółce ABC wynosi 2 mln zł. Rynek oczekuje, że ten przepływ gotówkowy będzie rósł co roku do nieskończoności o stopę równą oczekiwanemu wzrostowi PKB w Polsce, wynoszącą 4%. Spółka ABC finansuje się w 25% długiem, którego koszt wynosi 10%. Koszt kapitału własnego wynosi 14%. Jeżeli stopa podatkowa wynosi 32%, to wartość kapitału własnego firmy wynosi:</p>',
+ opts:['20,8 mln zł,','20,0 mln zł,','22,2 mln zł,','33,3 mln zł.'],vals:[20.8,20,22.2,33.3],ans:1,fmtV:v=>fmt(v,1)+' mln zł',
+ params:[{k:'f1',l:'FCFE za rok',v:2,u:'mln'},{k:'g',l:'Wzrost g',v:4,u:'%',pct:1},{k:'re',l:'Koszt kapitału własnego',v:14,u:'%',pct:1}],
+ solve:p=>{const e=p.f1/(p.re-p.g);return {value:e,steps:[
+  st('Rozpoznaj typ przepływu','To <b>FCFE</b> (free cash flow to equity) – przepływ <i>już po</i> obsłudze długu. Dyskontujemy go <b>kosztem kapitału własnego</b>, nie WACC.'),
+  st('Wartość kapitału własnego = Gordon na przepływach',eq(`E = ${fr('FCFE<sub>1</sub>','r<sub>kw</sub> − g')} = ${fr(fmt(p.f1,0),`${pc(p.re,0)} − ${pc(p.g,0)}`)} = ${fr(fmt(p.f1,0),pc(p.re-p.g,0))} = <b>${fmt(e,1)} mln zł</b>`)),
+  st('Dane zbędne','Udział długu (25%), koszt długu (10%) i podatek (32%) są <b>zbędne</b> – służyłyby do WACC (wartość całej firmy), a tu pytanie dotyczy wartości kapitału własnego.')
+ ]}},trap:'Użycie WACC (≈12,2%) dałoby błędną wartość 24,4 mln. Przepływ dla akcjonariuszy ↔ koszt kapitału własnego.'});
+
+/* ---------- ZADANIE DODATKOWE ---------- */
+add({id:'x1',grp:'Zadanie dodatkowe',label:'Zadanie dodatkowe 1 – Selekta',tags:['Mnożniki'],uses:['mult'],
+ text:'<p>Spółka Selekta wykazała w najbliższym sprawozdaniu finansowym następujące wyniki: przychody ze sprzedaży 100 mln zł, zysk operacyjny 20 mln zł, zysk brutto 5 mln zł, zysk netto 4 mln. Za rok od dzisiaj spółka zamierza wypłacić dywidendy o łącznej wartości 2 mln zł. Spółka w połowie finansuje się kapitałem własnym, a w połowie długiem, przy czym koszt kapitału jest szacowany na 10%, a odsetki od długu to 6%. Stopa podatkowa wynosi 18%. Kapitał własny spółki dzieli się na 2 mln sztuk akcji zwykłych.</p><p>Wskaźniki zysk netto na akcję (P/E) obliczone dla spółek działających w tej samej branży wynoszą: 10,5; 13,3; 14,2; 9,8; 11,2; 20,2; 5,6; 8,8; 9,2; 10,4.</p><p>Wykorzystując metodę mnożnikową oblicz ile powinna wynosić cena jednej sztuki spółki Selekta.</p>',
+ open:true,fmtV:v=>fmt(v,2)+' zł',
+ params:[{k:'zn',l:'Zysk netto',v:4,u:'mln zł'},{k:'n',l:'Liczba akcji',v:2,u:'mln szt.'},{k:'pe',l:'P/E spółek porównywalnych (po przecinku; lub ;)',v:'10,5; 13,3; 14,2; 9,8; 11,2; 20,2; 5,6; 8,8; 9,2; 10,4',t:'text'}],
+ solve:p=>{const arr=String(p.pe).split(/[;]+/).map(s=>parseFloat(s.trim().replace(',','.'))).filter(x=>isFinite(x));
+  if(!arr.length)return {value:NaN,steps:[st('Podaj poprawne wartości P/E','Rozdziel liczby średnikami.')]};
+  const s=[...arr].sort((a,b)=>a-b),m=arr.reduce((a,b)=>a+b,0)/arr.length,n=s.length,med=n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2,eps=p.zn/p.n;
+  const trim=n>4?s.slice(1,-1).reduce((a,b)=>a+b,0)/(n-2):m;
+  return {value:eps*m,steps:[
+  st('Wybierz, co jest potrzebne','Metoda mnożnikowa P/E: <b>cena = EPS × średnie P/E spółek porównywalnych</b>.'+ul(['Potrzebne: zysk netto, liczba akcji, mnożniki P/E branży.','<b>Zbędne</b>: przychody, zysk operacyjny/brutto, dywidenda, struktura finansowania, koszty kapitału, podatek – to dane „rozpraszające” (dotyczą DCF/Gordona, nie mnożników).'])),
+  st('Zysk na akcję (EPS)',eq(`EPS = ${fr('Z<sub>n</sub>','liczba akcji')} = ${fr(fmt(p.zn,0)+' mln',fmt(p.n,0)+' mln')} = <b>${fmt(eps,2)} zł</b>`)),
+  st('Mnożnik branżowy P/E',`Posortowane (${n} wartości): ${s.map(x=>fmt(x,1)).join('; ')}`+eq(`średnia = ${fr('Σ P/E',n)} = ${fr(fmt(arr.reduce((a,b)=>a+b,0),1),n)} = <b>${fmt(m,2)}</b>`,`mediana = <b>${fmt(med,2)}</b>`)+note('Wartość 20,2 (i 5,6) odstaje od reszty – dlatego dodatkowo pokazujemy medianę, odporną na wartości skrajne.')),
+  st('Cena akcji',eq(`P = EPS·P/E<sub>śr</sub> = ${fmt(eps,2)}·${fmt(m,2)} = <b>${fmt(eps*m,2)} zł</b>`)+`<div class="eq">Wariant z medianą: P = ${fmt(eps,2)}·${fmt(med,2)} = <b>${fmt(eps*med,2)} zł</b></div><div class="eq">Wariant po odrzuceniu skrajnych (najmniejszy i największy): P/E = ${fmt(trim,3)} ⇒ P = ${fmt(eps*trim,2)} zł</div>`)
+ ],extra:`Odpowiedź główna (średnia): <b>${fmt(eps*m,2)} zł</b>. Przy użyciu mediany: ${fmt(eps*med,2)} zł. Wszystkie wersje mieszczą się w przedziale ok. 21–23 zł.`}},
+ trap:'Polecenie nie precyzuje, czy użyć średniej czy mediany – podawaj średnią (standard na zajęciach), a medianę wspomnij jako kontrolę wartości skrajnych.'});
+
+/* ---------- DORADCA 2023 ---------- */
+add({id:'d13',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 13',tags:['Teoria','Mnożniki'],uses:['mult'],
+ text:'<p>13. Analityk banku inwestycyjnego ma wycenić spółkę ALFA używając metody mnożnikowej. Oszacował wskaźnik P/E<sub>0</sub> (cena akcji do zysków za ostatni rok obrotowy) dla porównywalnych spółek w oparciu o wyniki spółek w ostatnim roku. Spółka ALFA po okresie wysokiej rentowności zanotowała w ostatnim roku stratę. Analityk zakłada, że w kolejnych latach spółka wróci do dodatnich wyników. W odniesieniu do wyceny spółki ALFA przez analityka, które z poniższych stwierdzeń jest prawdziwe:</p>',
+ opts:['spółka jest nierentowna i należy jej wartość wycenić na zero;','do wyceny mnożnikowej analityk powinien oszacować zysk na podstawie historycznych wyników i zastosować wskaźnik P/E<sub>0</sub> dla porównywalnych spółek;','nie istnieją metody wyceny, które pozwalają wycenić spółkę, która nie generuje zysku;','jedyną prawidłową metodą wyceny nierentownej spółki jest metoda mnożnikowa.'],ans:1,
+ solve:()=>({steps:[
+  st('Zauważ problem','P/E = cena / zysk. Dla straty (zysk ujemny) mnożnik jest nieobliczalny/bezsensowny – nie można więc przemnożyć „straty” przez P/E.'),
+  st('Rozwiązanie – znormalizuj zysk','Skoro analityk zakłada powrót do dodatnich wyników, należy oszacować <b>zysk „znormalizowany”</b> (na podstawie wyników historycznych / średniego cyklu) i zastosować P/E<sub>0</sub> porównywalnych spółek. To odpowiedź B.'),
+  st('Odrzuć pozostałe',ul(['A – strata w jednym roku nie oznacza wartości zero (spółka ma majątek i perspektywy),','C – są metody: majątkowe, DCF (przepływy mogą być dodatnie mimo straty księgowej), mnożniki przychodowe (P/S, EV/S),','D – metoda mnożnikowa nie jest „jedyną” prawidłową.']))
+ ]}),trap:'Słowa-klucze w teście: „jedyną”, „nie istnieją”, „na zero” – takie skrajne sformułowania zwykle są fałszywe.'});
+
+add({id:'d16',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 16',tags:['EVA / ROE'],uses:['eva','nopat'],
+ text:'<p>16. Posiadasz następujące informacje finansowe o spółce A (w tys. zł):<br>Zysk operacyjny (przed opodatkowaniem, skorygowany dla potrzeb wyznaczania wskaźnika EVA): 390 000,<br>Podatek (dochodowy) od działalności operacyjnej: 60 000,<br>Zysk netto: 200 000,<br>Kapitał (zainwestowany kapitał łącznie – własny i obcy): 4 000 000.<br>Na podstawie powyższych danych, zakładając, że średni ważony koszt kapitału spółki A wynosi 8%, wskaż, której z wymienionych poniżej wartości jest najbliższa wartość kategorii: Ekonomiczna Wartość Dodana (EVA) tej spółki.</p>',
+ opts:['10 000 tys. zł;','25 000 tys. zł;','40 000 tys. zł;','210 00 tys. zł.'],vals:[10000,25000,40000,210000],ans:0,fmtV:v=>fmt(v,0)+' tys. zł',
+ params:[{k:'ebit',l:'Zysk operacyjny',v:390000,u:'tys.'},{k:'tax',l:'Podatek operacyjny',v:60000,u:'tys.'},{k:'C',l:'Kapitał',v:4000000,u:'tys.'},{k:'w',l:'WACC',v:8,u:'%',pct:1}],
+ solve:p=>{const nopat=p.ebit-p.tax,roc=nopat/p.C,eva=(roc-p.w)*p.C;return {value:eva,steps:[
+  st('Wybierz właściwe dane','EVA liczymy z zysku <b>operacyjnego po podatku</b> (NOPAT) i całego kapitału (własny + obcy). <b>Zysk netto (200 000) jest zbędny</b> – jest po odsetkach, więc nie pasuje do WACC.'),
+  st('NOPAT',eq(`NOPAT = ${fmt(p.ebit,0)} − ${fmt(p.tax,0)} = <b>${fmt(nopat,0)}</b>`)),
+  st('ROC',eq(`ROC = ${fr('NOPAT','C')} = ${fr(fmt(nopat,0),fmt(p.C,0))} = <b>${pc(roc,2)}</b>`)),
+  st('EVA ze wzoru z kartki',eq(`EVA = (ROC − WACC)·C<sub>0</sub> = (${pc(roc,2)} − ${pc(p.w,0)})·${fmt(p.C,0)} = <b>${fmt(eva,0)} tys. zł</b>`)+note(`Kontrola: NOPAT − WACC·C = ${fmt(nopat,0)} − ${fmt(p.w*p.C,0)} = ${fmt(nopat-p.w*p.C,0)} – ten sam wynik.`))
+ ]}},trap:'EVA = NOPAT − koszt <b>całego</b> kapitału. Ten, kto użyje zysku netto (200 000) dostanie błędne −120 000.'});
+
+add({id:'d17',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 17',tags:['EVA / ROE'],uses:['ratios','dupont'],
+ text:'<p>17. ROE (Return on Equity) pewnej firmy jest równe 30%. Wskaźnik pokrycia aktywów kapitałem własnym spółki wynosi 0,5 a rotacja aktywów 0,8. Jeśli całkowita sprzedaż netto firmy jest równa 1,35 mln zł, to jej zysk netto jest równy:</p>',
+ opts:['632 813 zł;','456 327 zł;','317 569 zł;','253 125 zł.'],vals:[632813,456327,317569,253125],ans:3,fmtV:v=>fmt(v,0)+' zł',
+ params:[{k:'roe',l:'ROE',v:30,u:'%',pct:1},{k:'ek',l:'Kapitał własny / aktywa',v:0.5,u:''},{k:'tat',l:'Rotacja aktywów TAT',v:0.8,u:''},{k:'S',l:'Sprzedaż',v:1350000,u:'zł'}],
+ solve:p=>{const A=p.S/p.tat,KW=p.ek*A,Zn=p.roe*KW;return {value:Zn,steps:[
+  st('Rozpisz, co oznaczają dane',ul(['„Wskaźnik pokrycia aktywów kapitałem własnym” = KW/A = '+fmt(p.ek,1),'Rotacja aktywów: TAT = S/A = '+fmt(p.tat,1),'ROE = Z<sub>n</sub>/KW = '+pc(p.roe,0)])+'Cel: Z<sub>n</sub> = ROE·KW. Musimy więc znaleźć <b>KW</b> – przez aktywa A.'),
+  st('Aktywa z rotacji',eq(`TAT = ${fr('S','A')}&emsp;⇒&emsp;A = ${fr('S','TAT')} = ${fr(fmt(p.S,0),fmt(p.tat,1))} = <b>${fmt(A,0)} zł</b>`)),
+  st('Kapitał własny',eq(`KW = ${fmt(p.ek,1)}·A = ${fmt(p.ek,1)}·${fmt(A,0)} = <b>${fmt(KW,2)} zł</b>`)),
+  st('Zysk netto z ROE',eq(`Z<sub>n</sub> = ROE·KW = ${fmt(p.roe,2)}·${fmt(KW,2)} = <b>${fmt(Zn,0)} zł</b>`)),
+  st('Kontrola (DuPont)',`Marża netto = Z<sub>n</sub>/S = ${pc(Zn/p.S,2)};  TAT = ${fmt(p.tat,1)};  A/KW = ${fmt(1/p.ek,1)}`+eq(`ROE = ${pc(Zn/p.S,2)}·${fmt(p.tat,1)}·${fmt(1/p.ek,1)} = ${pc(Zn/p.S*p.tat/p.ek,0)} ✓`))
+ ]}},trap:'Wskaźnik 0,5 to KW/A (nie A/KW). Gdyby ktoś odwrócił, dostałby 2·A i błędny wynik.'});
+
+add({id:'d21',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 21',tags:['Model Gordona'],uses:['g','gordon','tables'],
+ text:'<p>21. Zysk na akcję pewnej Spółki wypracowany w ostatnim roku wyniósł 10 zł. Spółka wypłaciła właśnie dywidendę 3 zł na akcję. Analitycy przewidują, że zyski Spółki będą rosły w okresie najbliższych 5 lat 10% rocznie i spółka utrzyma w tym okresie stopę wypłaty dywidendy na poziomie 30%. Natomiast po 5 latach tempo wzrostu zysków spadnie do 5% rocznie i utrzyma się w następnych latach, przy czym stopa wypłaty dywidendy wzrośnie w tym okresie do 50%. Podaj wartość jednej akcji Spółki jeżeli inwestorzy oczekują, że roczna stopa zwrotu wymagana w ciągu najbliższych 5 lat wynosi 12% rocznie a po tym okresie wynosi 10% rocznie.</p>',
+ opts:['110,17 zł;','183,32 zł;','115,66 zł;','192,12 zł.'],vals:[110.17,183.32,115.66,192.12],ans:0,fmtV:v=>fmt(v,2)+' zł',
+ params:[{k:'eps',l:'EPS ostatni rok',v:10,u:'zł'},{k:'g1',l:'Wzrost zysku (lata 1–5)',v:10,u:'%',pct:1},{k:'d1',l:'DPO (lata 1–5)',v:30,u:'%',pct:1},{k:'r1',l:'Stopa zwrotu (lata 1–5)',v:12,u:'%',pct:1},{k:'g2',l:'Wzrost zysku (po 5 latach)',v:5,u:'%',pct:1},{k:'d2',l:'DPO (po 5 latach)',v:50,u:'%',pct:1},{k:'r2',l:'Stopa zwrotu (po 5 latach)',v:10,u:'%',pct:1}],
+ solve:p=>{let eps=p.eps,rows=[],sum=0;for(let t=1;t<=5;t++){eps*=1+p.g1;const div=p.d1*eps,f=pvf(p.r1,t),pv=div*f;sum+=pv;rows.push([t,fmt(eps,3),fmt(div,3),fmt(f,4),fmt(pv,3)]);}
+  const eps6=eps*(1+p.g2),div6=p.d2*eps6,P5=div6/(p.r2-p.g2),pvP5=P5*pvf(p.r1,5),tot=sum+pvP5;return {value:tot,steps:[
+  st('Rozpoznaj model dwufazowy',ul(['<b>Faza 1 (lata 1–5):</b> zyski rosną 10%, DPO 30%, dyskonto 12% → dywidendy liczymy rok po roku.','<b>Faza 2 (od roku 6):</b> stały wzrost 5%, DPO 50%, dyskonto 10% → Gordon, wartość w chwili t = 5.','Dywidenda „3 zł” (=30%·10) to już przeszłość – nie wchodzi do wyceny.'])),
+  st('Dywidendy w latach 1–5',`Zysk rośnie co roku o 10%, a dywidenda to 30% zysku (stałe DPO ⇒ też rośnie 10%). Czynniki dyskontowe z tablicy „mnożnik wartości bieżącej”, kolumna 12%.`+tbl(['t','EPS<sub>t</sub>','DIV<sub>t</sub>=30%·EPS','PV-czynnik 12%','PV(DIV<sub>t</sub>)'],rows)+eq(`Σ PV(DIV) = <b>${fmt(sum,3)} zł</b>`)),
+  st('Wartość akcji na koniec roku 5 (Gordon)',`W fazie 2 zysk rośnie 5%, DPO = 50%, więc:`+eq(`EPS<sub>6</sub> = ${fmt(eps,3)}·${fmt(1+p.g2,2)} = ${fmt(eps6,3)}`,`DIV<sub>6</sub> = ${fmt(p.d2,2)}·${fmt(eps6,3)} = ${fmt(div6,3)}`,`P<sub>5</sub> = ${fr('DIV<sub>6</sub>','r<sub>2</sub> − g<sub>2</sub>')} = ${fr(fmt(div6,3),`${pc(p.r2,0)} − ${pc(p.g2,0)}`)} = <b>${fmt(P5,2)} zł</b>`)),
+  st('Zdyskontuj P<sub>5</sub> do dziś',`Do zdyskontowania używamy stopy z <b>fazy 1</b> (12%), bo to ona obowiązuje przez najbliższe 5 lat (stopa 10% służy tylko do liczenia wartości P<sub>5</sub>).`+eq(`PV(P<sub>5</sub>) = ${fmt(P5,2)}·${fmt(pvf(p.r1,5),4)} = <b>${fmt(pvP5,2)} zł</b>`)),
+  st('Suma',eq(`P<sub>0</sub> = ${fmt(sum,2)} + ${fmt(pvP5,2)} = <b>${fmt(tot,2)} zł</b>`)+note('Z czynnikami z tablic (4 miejsca) wyjdzie 110,16 zł – ta sama odpowiedź A.'))
+ ]}},trap:'Dwie różne stopy: 12% do dyskontowania w fazie 1 <b>i</b> do cofnięcia P<sub>5</sub>; 10% tylko w mianowniku Gordona dla P<sub>5</sub>. Dywidenda rośnie razem z zyskiem (stałe DPO).'});
+
+add({id:'d47',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 47',tags:['Model Gordona'],uses:['g','gordon'],
+ text:'<p>47. Spółka DELTA prognozuje, że na koniec roku zysk na akcję wyniesie 100. Zgodnie z przewidywaniami Spółki wskaźnik wypłaty dywidendy w przyszłości będzie stały i równy 0,2 zysku netto. ROE (Return on Equity) spółki będzie na stałym poziomie 15%. Na podstawie powyższych danych określ co stanie się z wartością akcji Spółki na rynku efektywnym jeżeli Spółka zdecyduje się na podwyższenie wskaźnika wypłaty dywidendy do 0,4 zysku netto. Przyjmij, że stopa zwrotu z akcji wynosi 15% rocznie i jest stała.</p>',
+ opts:['wartość akcji zmaleje;','wartość akcji pozostanie bez zmian;','wartość akcji wzrośnie;','na podstawie powyższych danych nie można wskazać kierunku zmian.'],ans:1,
+ params:[{k:'eps',l:'EPS₁',v:100,u:'zł'},{k:'d0',l:'DPO przed',v:20,u:'%',pct:1},{k:'d1',l:'DPO po',v:40,u:'%',pct:1},{k:'roe',l:'ROE',v:15,u:'%',pct:1},{k:'r',l:'Wymagana stopa zwrotu',v:15,u:'%',pct:1}],
+ solve:p=>{const g0=(1-p.d0)*p.roe,g1=(1-p.d1)*p.roe,P0=p.d0*p.eps/(p.r-g0),P1=p.d1*p.eps/(p.r-g1),eqf=Math.abs(P1-P0)<1e-6,idx=eqf?1:(P1>P0?2:0);
+  return {ansIdx:idx,valText:`P przed = ${fmt(P0,2)} zł, P po = ${fmt(P1,2)} zł`,steps:[
+  st('Policz wartość przy obecnej polityce (DPO = '+pc(p.d0,0)+')',eq(`g = (1 − DPO)·ROE = (1 − ${fmt(p.d0,2)})·${pc(p.roe,0)} = ${pc(g0,1)}`,`DIV<sub>1</sub> = DPO·EPS<sub>1</sub> = ${fmt(p.d0,2)}·${fmt(p.eps,0)} = ${fmt(p.d0*p.eps,0)}`,`P<sub>przed</sub> = ${fr(fmt(p.d0*p.eps,0),`${pc(p.r,0)} − ${pc(g0,1)}`)} = <b>${fmt(P0,2)} zł</b>`)),
+  st('Policz wartość po zmianie (DPO = '+pc(p.d1,0)+')',eq(`g = (1 − ${fmt(p.d1,2)})·${pc(p.roe,0)} = ${pc(g1,1)}`,`DIV<sub>1</sub> = ${fmt(p.d1,2)}·${fmt(p.eps,0)} = ${fmt(p.d1*p.eps,0)}`,`P<sub>po</sub> = ${fr(fmt(p.d1*p.eps,0),`${pc(p.r,0)} − ${pc(g1,1)}`)} = <b>${fmt(P1,2)} zł</b>`)),
+  st('Wniosek',eqf?`Wartości są <b>równe</b>. To nie przypadek: gdy <b>ROE = r</b>, spółka reinwestuje zyski w projekty o NPV = 0 – wypłata dywidendy czy reinwestycja daje akcjonariuszom ten sam efekt. Polityka dywidendy nie zmienia wartości akcji.`:(P1>P0?'Po zwiększeniu DPO wartość <b>rośnie</b> – gdy ROE &lt; r reinwestowanie niszczy wartość, więc lepiej wypłacać.':'Po zwiększeniu DPO wartość <b>maleje</b> – gdy ROE &gt; r reinwestowanie tworzy wartość, więc lepiej zatrzymywać zysk.')+note('Spróbuj zmienić ROE w panelu „Zmień dane”, żeby zobaczyć obie sytuacje.'))
+ ]}},trap:'Nie szukaj w danych liczby „do porównania” – wystarczy zauważyć, że <b>ROE = r = 15%</b>. Wtedy odpowiedź to „bez zmian”.'});
+
+add({id:'d48',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 48',tags:['WACC i CAPM'],uses:['mm','wacc'],
+ text:'<p>48. Wyznaczony zgodnie z formułami modelu Millera-Modiglianiego średni ważony koszt kapitału spółki Forma wynosi 11,04%. Opisujący strukturę kapitału tej spółki, wyznaczony na podstawie wartości rynkowych, wskaźnik Dług/Wartość spółki (jej aktywów) jest równy 0,4. Na podstawie powyższych danych, zakładając, że spółka płaci podatek dochodowy w wysokości 20% określ, ile wyniósłby koszt kapitału własnego tej spółki, jeżeli w wyniku zmiany struktury kapitału (przeprowadzonej bez zmiany aktywów) spółka w całości stałaby się finansowana kapitałem własnym. Wskaż najbliższą wartość.</p>',
+ opts:['11,5%;','12,0%;','12,5%;','13,5%.'],vals:[.115,.12,.125,.135],ans:1,fmtV:v=>pc(v,2),
+ params:[{k:'w',l:'WACC',v:11.04,u:'%',pct:1},{k:'dv',l:'Dług / Wartość',v:0.4,u:''},{k:'T',l:'Podatek T',v:20,u:'%',pct:1}],
+ solve:p=>{const f=1-p.T*p.dv,r0=p.w/f;return {value:r0,steps:[
+  st('Co oznacza „w całości finansowana kapitałem własnym”?','To spółka <b>bez długu</b> – jej koszt kapitału własnego to r<sub>0</sub> (koszt kapitału spółki niezadłużonej), a WACC = r<sub>0</sub>.'),
+  st('Wzór M&M z podatkami (WACC a r<sub>0</sub>)',`Dług daje tarczę podatkową, która obniża WACC:`+eq(`WACC = r<sub>0</sub>·(1 − T·${fr('D','V')})`)+'To skrót wynikający z M&M (I i II): WACC = r<sub>0</sub> − T·r<sub>0</sub>·D/V.'),
+  st('Rozwiąż względem r<sub>0</sub>',eq(`1 − T·${fr('D','V')} = 1 − ${fmt(p.T,2)}·${fmt(p.dv,1)} = ${fmt(f,3)}`,`r<sub>0</sub> = ${fr('WACC',fmt(f,3))} = ${fr(pc(p.w,2),fmt(f,3))} = <b>${pc(r0,2)}</b>`)),
+  st('Odpowiedź','Koszt kapitału własnego spółki bez długu = <b>12,0%</b>.')
+ ]}},trap:'Nie szukaj kosztu długu – nie jest potrzebny. Zadanie jest ułożone tak, by r<sub>0</sub> = 12% „wyszło równo”.'});
+
+add({id:'d60',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 60',tags:['Mnożniki','EVA / ROE'],uses:['dupont','pe','ratios'],
+ text:'<p>60. Wyznacz wartość wskaźnika Cena/Zysk (P/E), jeżeli ilość wyemitowanych akcji wynosi 2 mln sztuk, wskaźnik zadłużenia ogółem/kapitał własny wynosi 0,7, wskaźnik ROA (zysk netto/aktywa ogółem) wynosi 15% zaś wskaźnik Cena/Wartość księgowa (P/BV) wynosi 3,5.</p>',
+ opts:['9,72;','19,23;','14,17;','13,73.'],vals:[9.72,19.23,14.17,13.73],ans:3,fmtV:v=>fmt(v,2),
+ params:[{k:'de',l:'Zobowiązania / kapitał własny',v:0.7,u:''},{k:'roa',l:'ROA',v:15,u:'%',pct:1},{k:'pbv',l:'P/BV',v:3.5,u:''}],
+ solve:p=>{const lev=1+p.de,roe=p.roa*lev,pe=p.pbv/roe;return {value:pe,steps:[
+  st('Zaplanuj','P/E = P/Z<sub>n</sub>. Mamy P/BV = P/KW. Wystarczy P/BV podzielić przez ROE = Z<sub>n</sub>/KW. Brakuje ROE – obliczymy z ROA i zadłużenia.'+eq(`P/E = ${fr('P','Z<sub>n</sub>')} = ${fr('P/KW','Z<sub>n</sub>/KW')} = ${fr('P/BV','ROE')}`)),
+  st('ROE z ROA (dźwignia)','Aktywa = kapitał własny + zobowiązania, więc A/KW = 1 + D/KW:'+eq(`ROE = ROA·${fr('A','KW')} = ROA·(1 + ${fr('D','KW')}) = ${pc(p.roa,0)}·(1 + ${fmt(p.de,1)}) = <b>${pc(roe,1)}</b>`)),
+  st('P/E',eq(`P/E = ${fr('P/BV','ROE')} = ${fr(fmt(p.pbv,1),fmt(roe,3))} = <b>${fmt(pe,2)}</b>`)),
+  st('Dana zbędna','Liczba akcji (2 mln) nie jest potrzebna – wszystkie wskaźniki są względne.')
+ ]}},trap:'Dźwignia to A/KW = 1 + 0,7 = 1,7 (nie 0,7!). Dla 0,7 wyszłoby 33,3 – nie ma takiej odpowiedzi.'});
+
+add({id:'d63',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 63',tags:['WACC i CAPM'],uses:['wacc','pref','tables'],
+ text:'<p>63. Korporacja ABC finansuje się emisją 10-letnich obligacji o nominale 1000 USD i rocznym kuponie wynoszącym 11%. Bank inwestycyjny określił koszty emisji obligacji na 1% nominału. Stawka podatku dochodowego wynosi 19%. Korporacja ABC już wyemitowała nieme akcje o nominale 100 USD, których koszt emisji został określony przez bank inwestycyjny na 1,5% nominału. Stopa dywidendy rocznej wynosi 10% wartości nominalnej i jest to stała dywidenda. Emisja akcji niemych jest jedyną formą finansowania poprzez kapitał akcyjny. Analizowana korporacja finansuje się w 80% długiem. W takich warunkach:</p>',
+ opts:['WACC (średni ważony koszt kapitału) nie przekracza 10%;','WACC przekracza 10%;','nie można ustalić WACC, gdyż nie wiadomo, ile wyemitowano obligacji;','nie można ustalić WACC, gdyż nie wiadomo, ile wyemitowano akcji.'],ans:0,
+ params:[{k:'N',l:'Nominał obligacji',v:1000,u:'USD'},{k:'c',l:'Kupon',v:11,u:'%',pct:1},{k:'k',l:'Koszt emisji obligacji',v:1,u:'%',pct:1},{k:'T',l:'Podatek T',v:19,u:'%',pct:1},{k:'Np',l:'Nominał akcji',v:100,u:'USD'},{k:'kp',l:'Koszt emisji akcji',v:1.5,u:'%',pct:1},{k:'dp',l:'Dywidenda (% nominału)',v:10,u:'%',pct:1},{k:'wd',l:'Udział długu',v:80,u:'%',pct:1}],
+ solve:p=>{const net=p.N*(1-p.k),cp=p.N*p.c,f=y=>cp*pva(y,10)+p.N*pvf(y,10)-net;let a=.0001,b=.5;for(let i=0;i<200;i++){const m=(a+b)/2;if(f(m)>0)a=m;else b=m;}const y=(a+b)/2,rdn=y*(1-p.T),rp=p.Np*p.dp/(p.Np*(1-p.kp)),w=p.wd*rdn+(1-p.wd)*rp;
+  const v11=cp*pva(.11,10)+p.N*pvf(.11,10),v12=cp*pva(.12,10)+p.N*pvf(.12,10),yi=.11+(v11-net)/(v11-v12)*.01;
+  return {ansIdx:w<=.1?0:1,valText:`WACC ≈ ${pc(w,2)}`,steps:[
+  st('Wyjaśnij najpierw odpowiedzi C i D','Wagi są podane (<b>80% dług, 20% kapitał akcyjny</b>) – liczba wyemitowanych instrumentów nie jest potrzebna. Pozostaje policzyć WACC i porównać z 10%.'),
+  st('Koszt długu = rentowność obligacji do wykupu (po kosztach emisji)',`Wpływ netto z emisji: ${fmt(p.N,0)}·(1 − ${pc(p.k,0)}) = <b>${fmt(net,0)} USD</b>. Kupon = ${fmt(cp,0)} USD rocznie, 10 lat, wykup ${fmt(p.N,0)} USD. Szukamy y:`+eq(`${fmt(net,0)} = ${fmt(cp,0)}·PVA(y;10) + ${fmt(p.N,0)}·PV(y;10)`)+`Z tablic: dla y = 11% → ${fmt(cp,0)}·${fmt(pva(.11,10),4)} + ${fmt(p.N,0)}·${fmt(pvf(.11,10),4)} = ${fmt(v11,1)}; dla y = 12% → ${fmt(cp,0)}·${fmt(pva(.12,10),4)} + ${fmt(p.N,0)}·${fmt(pvf(.12,10),4)} = ${fmt(v12,1)}.`+eq(`interpolacja: y ≈ 11% + ${fr(fmt(v11,1)+' − '+fmt(net,0),fmt(v11,1)+' − '+fmt(v12,1))}·1% = ${pc(yi,2)}&emsp;(dokładnie: <b>${pc(y,2)}</b>)`)),
+  st('Koszt długu po opodatkowaniu',eq(`r<sub>d</sub>·(1 − T) = ${pc(y,2)}·(1 − ${fmt(p.T,2)}) = <b>${pc(rdn,2)}</b>`)),
+  st('Koszt akcji niemych (uprzywilejowanych)',`Dywidenda stała (renta wieczysta) = ${fmt(p.Np*p.dp,0)} USD; wpływ netto = ${fmt(p.Np,0)}·(1 − ${pc(p.kp,1)}) = ${fmt(p.Np*(1-p.kp),1)} USD.`+eq(`r<sub>p</sub> = ${fr(fmt(p.Np*p.dp,0),fmt(p.Np*(1-p.kp),1))} = <b>${pc(rp,2)}</b>`)+'Dywidendy nie dają tarczy podatkowej (płacone z zysku po opodatkowaniu).'),
+  st('WACC',eq(`WACC = ${fmt(p.wd,2)}·${pc(rdn,2)} + ${fmt(1-p.wd,2)}·${pc(rp,2)} = ${pc(p.wd*rdn,2)} + ${pc((1-p.wd)*rp,2)} = <b>${pc(w,2)}</b>`)+(w<=.1?'<b>WACC &lt; 10%</b> ⇒ odpowiedź A.':'<b>WACC &gt; 10%</b> ⇒ odpowiedź B.')),
+  st('Szybka ścieżka na egzaminie','Żaden ze składników nie przekracza ok. 10,2%, a 80% wagi ma dług po podatku (~9%). Średnia ważona musi być poniżej 10% – nie trzeba liczyć dokładnie.')
+ ]}},trap:'Koszty emisji zmniejszają wpływy, więc <b>podnoszą</b> koszt kapitału (dlatego YTM obligacji jest nieco ponad 11%, a r<sub>p</sub> ponad 10%).'});
+
+add({id:'d64',grp:'Doradca 2023',label:'Doradca 2023 · zad. 64',tags:['Model Gordona'],uses:['g','gordon'],
+ text:'<p>64. Dywidenda wypłacona przez spółkę KROPKA za ostatni rok, który właśnie upłynął, wyniosła 5 zł. Spółka prowadzi politykę dywidendy, zgodnie z którą zawsze wypłaca ona w formie dywidendy 40% zysku, zatrzymując 60% zysku, którą zamierza utrzymać w przyszłości. Stopa zwrotu z kapitału własnego spółki ROE (Return on Equity) wynosi niezmiennie 20%, zaś oczekiwana stopa zwrotu z jej akcji wynosi 15%. Na podstawie powyższych danych, zakładając, iż rynek jest efektywny, oszacuj, której z wymienionych poniżej wartości jest najbliższa rynkowa cena akcji spółki KROPKA.</p>',
+ opts:['166,67 zł;','176,67 zł;','186,67 zł;','196,67 zł.'],vals:[166.67,176.67,186.67,196.67],ans:2,fmtV:v=>fmt(v,2)+' zł',
+ params:[{k:'D0',l:'Dywidenda za ost. rok (DIV₀)',v:5,u:'zł'},{k:'f',l:'Stopa zatrzymania f',v:60,u:'%',pct:1},{k:'roe',l:'ROE',v:20,u:'%',pct:1},{k:'r',l:'Wymagana stopa zwrotu',v:15,u:'%',pct:1}],
+ solve:p=>{const g=p.f*p.roe,D1=p.D0*(1+g),P=D1/(p.r-g);return {value:P,steps:[
+  st('Rozpoznaj dane','60% zysku jest zatrzymywane ⇒ <b>f = 0,6</b>, a 5 zł to dywidenda <b>za ostatni rok</b> (DIV<sub>0</sub>), nie za przyszły.'),
+  st('Stopa wzrostu dywidendy',eq(`g = f·ROE = ${fmt(p.f,1)}·${pc(p.roe,0)} = <b>${pc(g,0)}</b>`)),
+  st('Dywidenda za rok',eq(`DIV<sub>1</sub> = DIV<sub>0</sub>·(1 + g) = ${fmt(p.D0,0)}·${fmt(1+g,2)} = <b>${fmt(D1,2)} zł</b>`)),
+  st('Wycena Gordona',eq(`P = ${fr('DIV<sub>1</sub>','r − g')} = ${fr(fmt(D1,2),`${pc(p.r,0)} − ${pc(g,0)}`)} = ${fr(fmt(D1,2),pc(p.r-g,0))} = <b>${fmt(P,2)} zł</b>`))
+ ]}},trap:'Odpowiedź 166,67 zł to 5/0,03 – pominięty wzrost DIV₀ → DIV₁ (klasyczny błąd).'});
+
+add({id:'d79',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 79',tags:['Model Gordona'],uses:['g','gordon','tables'],
+ text:'<p>79. Analityk ma za zadanie wycenić spółkę X, która do tej pory nie wypłacała dywidendy. Zysk netto wypracowany przez spółkę za ostatni rok wyniósł 2 zł na akcję. Zgodnie z prognozą analityka zysk będzie rósł o 10% rocznie przez kolejne trzy lata. Analityk zakłada, że po tym okresie szybkiego wzrostu spółka zacznie wypłacać dywidendę i będzie zatrzymywać 70% zysku w spółce oraz oczekuje, że stopa wzrostu zysku spadnie o 50%. Przy wymaganej stopie zwrotu 12% wyznacz wartość bieżącą przyszłych dywidend wypłaconych przez Spółkę.</p>',
+ opts:['20 zł;','9 zł;','8,5 zł;','7,6 zł.'],vals:[20,9,8.5,7.6],ans:2,fmtV:v=>fmt(v,2)+' zł',
+ params:[{k:'eps',l:'EPS ostatni rok',v:2,u:'zł'},{k:'g1',l:'Wzrost zysku (3 lata)',v:10,u:'%',pct:1},{k:'f',l:'Stopa zatrzymania po okresie',v:70,u:'%',pct:1},{k:'r',l:'Wymagana stopa zwrotu',v:12,u:'%',pct:1}],
+ solve:p=>{const e3=p.eps*Math.pow(1+p.g1,3),g2=p.g1/2,e4=e3*(1+g2),dpo=1-p.f,d4=dpo*e4,P3=d4/(p.r-g2),P0=P3*pvf(p.r,3);return {value:P0,steps:[
+  st('Rozpisz oś czasu',ul(['Lata 1–3: zysk rośnie 10%, <b>dywidendy = 0</b> (spółka jeszcze nie płaci).','Od roku 4: spółka zatrzymuje 70% ⇒ <b>DPO = 30%</b>; wzrost zysku „spada o 50%” ⇒ g = 10%·0,5 = <b>5%</b>.','Wszystkie wypłaty to dywidendy od roku 4 – wyceniamy je Gordonem na moment t = 3, a potem cofamy o 3 lata.'])),
+  st('Zysk i dywidenda w roku 4',eq(`EPS<sub>3</sub> = ${fmt(p.eps,0)}·${fmt(1+p.g1,2)}<sup>3</sup> = ${fmt(e3,4)}`,`EPS<sub>4</sub> = ${fmt(e3,4)}·${fmt(1+g2,2)} = ${fmt(e4,4)}`,`DIV<sub>4</sub> = ${fmt(dpo,2)}·${fmt(e4,4)} = <b>${fmt(d4,4)} zł</b>`)),
+  st('Wartość w chwili t = 3 (Gordon)',eq(`P<sub>3</sub> = ${fr('DIV<sub>4</sub>','r − g')} = ${fr(fmt(d4,4),`${pc(p.r,0)} − ${pc(g2,0)}`)} = <b>${fmt(P3,3)} zł</b>`)),
+  st('Zdyskontuj o 3 lata',`Z tablicy „mnożnik wartości bieżącej”: 12%, n = 3 ⇒ <b>${fmt(pvf(p.r,3),4)}</b>.`+eq(`P<sub>0</sub> = ${fmt(P3,3)}·${fmt(pvf(p.r,3),4)} = <b>${fmt(P0,2)} zł</b>`))
+ ]}},trap:'„Spadnie o 50%” = stopa wzrostu zysku <b>zmniejsza się o połowę</b> (10% → 5%), a nie o 50 punktów procentowych.'});
+
+add({id:'d80',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 80',tags:['Prawdopodobieństwo'],uses:['prob'],
+ text:'<p>80. Prawdopodobieństwo wypłaty dywidendy w spółce A wynosi 0,3 w przypadku osiągnięcia zysku mniejszego niż zysk roku poprzedniego i 0,7 w przypadku osiągnięcia zysku większego. Prawdopodobieństwo zakończenia roku obrotowego zyskiem większym od zysku zeszłorocznego wynosi 0,4. Oblicz jakie jest prawdopodobieństwo, że spółka osiągnie zysk większy od zeszłorocznego ale spółka nie wypłaci dywidendy.</p>',
+ opts:['0,78;','0,12;','0,33;','0,22.'],vals:[.78,.12,.33,.22],ans:1,fmtV:v=>fmt(v,2),
+ params:[{k:'pu',l:'P(zysk większy)',v:0.4,u:''},{k:'pdu',l:'P(dywidenda | zysk większy)',v:0.7,u:''},{k:'pdd',l:'P(dywidenda | zysk mniejszy)',v:0.3,u:''}],
+ solve:p=>{const pd=1-p.pu,a=p.pu*p.pdu,b=p.pu*(1-p.pdu),c=pd*p.pdd,d=pd*(1-p.pdd);return {value:b,steps:[
+  st('Zapisz zdarzenia',ul(['U – zysk większy niż rok temu: P(U) = '+fmt(p.pu,1)+' ⇒ zysk mniejszy: P(U′) = '+fmt(pd,1),'D – wypłata dywidendy: P(D|U) = '+fmt(p.pdu,1)+', P(D|U′) = '+fmt(p.pdd,1),'Szukamy: <b>P(U ∩ D′)</b> – zysk większy <i>i</i> brak dywidendy.'])),
+  st('Dopełnienie warunkowe',eq(`P(D′ | U) = 1 − P(D | U) = 1 − ${fmt(p.pdu,1)} = ${fmt(1-p.pdu,1)}`)),
+  st('Reguła mnożenia',eq(`P(U ∩ D′) = P(U)·P(D′ | U) = ${fmt(p.pu,1)}·${fmt(1-p.pdu,1)} = <b>${fmt(b,2)}</b>`)),
+  st('Drzewko – kontrola',tbl(['Gałąź','Obliczenie','Wynik'],[['U i D',`${fmt(p.pu,1)}·${fmt(p.pdu,1)}`,fmt(a,2)],['<b>U i brak D</b>',`${fmt(p.pu,1)}·${fmt(1-p.pdu,1)}`,'<b>'+fmt(b,2)+'</b>'],['U′ i D',`${fmt(pd,1)}·${fmt(p.pdd,1)}`,fmt(c,2)],['U′ i brak D',`${fmt(pd,1)}·${fmt(1-p.pdd,1)}`,fmt(d,2)],['Suma','',fmt(a+b+c+d,2)]]))
+ ]}},trap:'Pozostałe odpowiedzi to wyniki innych gałęzi drzewka (np. 0,28 = zysk i dywidenda). Wystarczy jedno mnożenie: 0,4 × (1 − 0,7).'});
+
+add({id:'d83',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 83',tags:['Teoria','Prawdopodobieństwo'],uses:['sharpe'],
+ text:'<p>83. Oszacowanie parametrów modelu jednowskaźnikowego (Sharpe’a) dla spółki A dało rezultat przedstawiony w postaci poniższego wzoru:<br>R = 0,01 + 0,8·R<sub>M</sub> + e,<br>gdzie: R – stopa zwrotu z akcji spółki A, R<sub>M</sub> – stopa zwrotu z indeksu rynkowego, e – składnik losowy, wariancja składnika losowego 0,01.<br>Na podstawie powyższych informacji, wiedząc, że odchylenie standardowe stopy zwrotu z indeksu rynkowego wynosi 0,20 określ, której z poniższych wartości jest najbliższe odchylenie standardowe stopy zwrotu z akcji spółki A, wyznaczone przy założeniu, że na rynku spełnione są założenia modelu jednowskaźnikowego (Sharpe’a).</p>',
+ opts:['0,1525;','0,1654;','0,1795;','0,1886.'],vals:[.1525,.1654,.1795,.1886],ans:3,fmtV:v=>fmt(v,4),
+ params:[{k:'b',l:'Beta (współczynnik 0,8)',v:0.8,u:''},{k:'sm',l:'σ indeksu rynkowego',v:0.2,u:''},{k:'ve',l:'Wariancja składnika losowego',v:0.01,u:''}],
+ solve:p=>{const sys=p.b*p.b*p.sm*p.sm,v=sys+p.ve,s=Math.sqrt(v);return {value:s,steps:[
+  st('Zapisz wariancję w modelu Sharpe’a','Stała (0,01) nie wpływa na wariancję. Zmienna R<sub>M</sub> i składnik losowy e są nieskorelowane, więc wariancje się sumują:'+eq(`σ<sub>A</sub><sup>2</sup> = β<sup>2</sup>·σ<sub>M</sub><sup>2</sup> + σ<sub>e</sub><sup>2</sup>`)),
+  st('Podstaw liczby',eq(`β<sup>2</sup>·σ<sub>M</sub><sup>2</sup> = ${fmt(p.b,1)}<sup>2</sup>·${fmt(p.sm,2)}<sup>2</sup> = ${fmt(p.b*p.b,2)}·${fmt(p.sm*p.sm,2)} = ${fmt(sys,4)}`,`σ<sub>A</sub><sup>2</sup> = ${fmt(sys,4)} + ${fmt(p.ve,2)} = <b>${fmt(v,4)}</b>`)),
+  st('Pierwiastek',eq(`σ<sub>A</sub> = √${fmt(v,4)} = <b>${fmt(s,4)}</b>`)+note('Wynik 0,18868… – najbliżej opcji D (0,1886).'))
+ ]}},trap:'Pułapka: dodanie odchyleń (0,8·0,2 + 0,1 = 0,26) zamiast wariancji. Zawsze dodawaj <b>wariancje</b>, potem pierwiastek.'});
+
+add({id:'d87',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 87',tags:['Teoria','Model Gordona'],uses:['g'],
+ text:'<p>87. Analityk finansowy wycenia akcje spółki ZAMIAST i przyjął model stałego wzrostu dywidendy. Stosując takie podejście można przypuszczać, że nieprawdziwym opisem działań wspomnianego analityka jest:</p>',
+ opts:['chęć ustalenia, czy cena rynkowa akcji jest niedoszacowana;','przyjęcie pewnej wymaganej stopy zwrotu;','chęć ustalenia ROA (Return on Assets) analizowanej spółki w celu wyznaczenia stopy wzrostu dywidendy;','chęć wykorzystania stopy wzrostu dywidendy do wyceny akcji spółki ZAMIAST.'],ans:2,
+ solve:()=>({steps:[
+  st('Zauważ: pytanie szuka tego, co jest NIEPRAWDZIWE','Sprawdzamy każde zdanie względem modelu Gordona.'),
+  st('Wzory z kartki',eq(`g = (1 − DPO)·ROE`,`P = ${fr('DIV<sub>1</sub>','r<sub>kw</sub> − g')}`)+'Stopę wzrostu dywidendy wyznacza <b>ROE</b> (zwrot z kapitału własnego), a nie ROA.'),
+  st('Oceń odpowiedzi',ul(['A – model służy m.in. do porównania wartości wewnętrznej z ceną rynkową (czy akcje są niedowartościowane) → <b>prawda</b>,','B – model wymaga założenia wymaganej stopy zwrotu r → <b>prawda</b>,','C – do wyznaczenia g analityk potrzebuje <b>ROE</b>, nie ROA → <b>FAŁSZ</b>,','D – g jest kluczowym wejściem do modelu → <b>prawda</b>.'])),
+  st('Odpowiedź','Nieprawdziwy jest opis <b>C</b>.')
+ ]}),trap:'ROA = Z<sub>n</sub>/A (aktywa), ROE = Z<sub>n</sub>/KW (kapitał własny). Dywidendę finansują właściciele, więc w g liczy się <b>ROE</b>.'});
+
+add({id:'d99',grp:'Doradca 2023',label:'Doradca 2023 · pyt. 99',tags:['Mnożniki','Model Gordona'],uses:['g','gordon','ps'],
+ text:'<p>99. Zarządzający funduszem chce porównać wskaźnik cena do sprzedaży (P/S – Price/Sales) analizowanej spółki do konkurencyjnych podmiotów działających w sektorze spożywczym. Dla analizowanej spółki zebrał następujące dane: wskaźnik wypłaty dywidend d=60%, zwrot na kapitale ROE=15% (ROE – Return on Equity), zysk na akcje za ostatni rok EPS=6 zł (EPS – Earnings Per Share) i sprzedaż na akcję 250 zł. Wymagana stopa zwrotu z akcji to r=10%. Wskaż wyznaczoną przez analityka wartość wskaźnika cena do sprzedaży P/S.</p>',
+ opts:['0,17;','0,25;','0,38;','0,45.'],vals:[.17,.25,.38,.45],ans:2,fmtV:v=>fmt(v,2),
+ params:[{k:'d',l:'DPO',v:60,u:'%',pct:1},{k:'roe',l:'ROE',v:15,u:'%',pct:1},{k:'eps',l:'EPS (ostatni rok)',v:6,u:'zł'},{k:'s',l:'Sprzedaż na akcję',v:250,u:'zł'},{k:'r',l:'Wymagana stopa zwrotu',v:10,u:'%',pct:1}],
+ solve:p=>{const g=(1-p.d)*p.roe,D0=p.d*p.eps,D1=D0*(1+g),P=D1/(p.r-g),ps=P/p.s;return {value:ps,steps:[
+  st('Plan','P/S = cena / sprzedaż na akcję. Sprzedaż jest dana, więc trzeba wycenić <b>cenę</b> – modelem Gordona.'),
+  st('Stopa wzrostu dywidendy',eq(`g = (1 − d)·ROE = (1 − ${fmt(p.d,2)})·${pc(p.roe,0)} = <b>${pc(g,0)}</b>`)),
+  st('Dywidendy',`EPS dotyczy <b>ostatniego roku</b>, więc dywidenda z niego to DIV<sub>0</sub>.`+eq(`DIV<sub>0</sub> = d·EPS = ${fmt(p.d,2)}·${fmt(p.eps,0)} = ${fmt(D0,2)} zł`,`DIV<sub>1</sub> = DIV<sub>0</sub>·(1 + g) = ${fmt(D0,2)}·${fmt(1+g,2)} = ${fmt(D1,3)} zł`)),
+  st('Cena z Gordona',eq(`P = ${fr('DIV<sub>1</sub>','r − g')} = ${fr(fmt(D1,3),`${pc(p.r,0)} − ${pc(g,0)}`)} = <b>${fmt(P,2)} zł</b>`)),
+  st('P/S',eq(`P/S = ${fr('P','S')} = ${fr(fmt(P,2),fmt(p.s,0))} = <b>${fmt(ps,3)}</b> ≈ ${fmt(ps,2)}`)+note(`Kontrola: marża netto = EPS/S = ${pc(p.eps/p.s,1)}, P/E<sub>0</sub> = ${fmt(P/p.eps,2)}; P/S = marża·P/E = ${fmt(p.eps/p.s*P/p.eps,3)}.`))
+ ]}},trap:'Gdyby użyć DIV<sub>0</sub> zamiast DIV<sub>1</sub>: P = 90 zł, P/S = 0,36 – blisko, ale to nie ta odpowiedź (0,38).'});
+
+/* ---------- DORADCA 2022 ---------- */
+add({id:'q16',grp:'Doradca 2022',label:'Doradca 2022 · pyt. 16',tags:['Teoria'],uses:[],
+ text:'<p>16. Wskaż, który z wymienionych poniżej indeksów akcji należy uznać za indeks cenowy:</p>',
+ opts:['indeks WIG;','indeks S&P 500;','indeks Nikkei-Dow Jones Average;','indeks NASDAQ Composite.'],ans:2,unsure:true,
+ solve:()=>({steps:[
+  st('Skojarz „indeks cenowy” z metodą ważenia','W polskich podręcznikach (np. u Jajugi) indeksy giełdowe dzieli się m.in. według sposobu ważenia składników:'+ul(['<b>indeksy cenowe</b> (ważone ceną) – wagą jest <i>cena</i> akcji: <b>Dow Jones, Nikkei 225 (Nikkei-Dow Jones Average)</b>,','<b>indeksy kapitalizacyjne</b> (ważone wartością rynkową) – wagą jest kapitalizacja: <b>S&P 500, NASDAQ Composite, WIG</b>, DAX, FTSE.'])),
+  st('Dopasuj do odpowiedzi','Nazwa „Nikkei-Dow Jones Average” to dawna nazwa Nikkei 225, liczonego metodą Dow Jonesa – <b>średnia cen</b> akcji. Pozostałe indeksy są ważone kapitalizacją ⇒ odpowiedź <b>C</b>.'),
+  st('Uwaga o niejednoznaczności',warn('W innym znaczeniu „cenowy” (bez dywidend) vs „dochodowy” (z dywidendami) cenowymi są też S&P 500 i NASDAQ Composite, a WIG jest dochodowy. Pytanie jest więc dwuznaczne – klucz odpowiedzi KNF nie był dostępny. Najbardziej prawdopodobna odpowiedź to C (podział wg ważenia); jeśli Twój wykładowca uczył podziału cenowy/dochodowy, sprawdź w swoich notatkach.'))
+ ]}),trap:'Zapamiętaj prosty trik: <b>Dow Jones / Nikkei = ważone ceną</b>; reszta = ważone kapitalizacją. WIG dodatkowo jest indeksem <b>dochodowym</b>.'});
+
+add({id:'q18',grp:'Doradca 2022',label:'Doradca 2022 · pyt. 18',tags:['Prawdopodobieństwo'],uses:['ep'],
+ text:'<p>18. Prawdopodobieństwo uzyskania przez akcję spółki F wymienionych poziomów cen za rok od dnia dzisiejszego przedstawia się w sposób zaprezentowany poniżej:</p><table class="t"><tr><th>Prawdopodobieństwo</th><th>Cena (zł)</th></tr><tr><td>25%</td><td>100</td></tr><tr><td>40%</td><td>120</td></tr><tr><td>35%</td><td>140</td></tr></table><p>Zakładając, iż inwestor zakupuje dzisiaj akcję spółki F za 110 zł i panuje zgoda na rynku, iż na koniec najbliższego roku wypłacona będzie dywidenda od tej akcji w wysokości 8 zł, wyznacz, której z poniżej wymienionych wartości jest najbliższa oczekiwana roczna stopa zwrotu z akcji spółki F za okres inwestycyjny obejmujący najbliższy rok.</p>',
+ opts:['7,27%;','16,36%;','18,18%;','19,15%.'],vals:[.0727,.1636,.1818,.1915],ans:2,fmtV:v=>pc(v,2),
+ params:[{k:'p1',l:'p₁ (%)',v:25,u:'%',pct:1},{k:'c1',l:'Cena 1',v:100,u:'zł'},{k:'p2',l:'p₂ (%)',v:40,u:'%',pct:1},{k:'c2',l:'Cena 2',v:120,u:'zł'},{k:'p3',l:'p₃ (%)',v:35,u:'%',pct:1},{k:'c3',l:'Cena 3',v:140,u:'zł'},{k:'P0',l:'Cena zakupu',v:110,u:'zł'},{k:'D',l:'Dywidenda',v:8,u:'zł'}],
+ solve:p=>{const e=p.p1*p.c1+p.p2*p.c2+p.p3*p.c3,r=(e+p.D-p.P0)/p.P0;return {value:r,steps:[
+  st('Oczekiwana cena za rok (wartość oczekiwana)',tbl(['Scenariusz','p','Cena','p·Cena'],[[1,pc(p.p1,0),fmt(p.c1,0),fmt(p.p1*p.c1,2)],[2,pc(p.p2,0),fmt(p.c2,0),fmt(p.p2*p.c2,2)],[3,pc(p.p3,0),fmt(p.c3,0),fmt(p.p3*p.c3,2)],['Σ',pc(p.p1+p.p2+p.p3,0),'',`<b>${fmt(e,2)}</b>`]])+eq(`E(P<sub>1</sub>) = <b>${fmt(e,2)} zł</b>`)),
+  st('Stopa zwrotu = zysk kapitałowy + dywidenda',eq(`r = ${fr('E(P<sub>1</sub>) + DIV − P<sub>0</sub>','P<sub>0</sub>')} = ${fr(`${fmt(e,0)} + ${fmt(p.D,0)} − ${fmt(p.P0,0)}`,fmt(p.P0,0))} = ${fr(fmt(e+p.D-p.P0,0),fmt(p.P0,0))} = <b>${pc(r,2)}</b>`)),
+  st('Rozbicie (kontrola)',`Zysk kapitałowy: (${fmt(e,0)} − ${fmt(p.P0,0)})/${fmt(p.P0,0)} = ${pc((e-p.P0)/p.P0,2)}; stopa dywidendy: ${fmt(p.D,0)}/${fmt(p.P0,0)} = ${pc(p.D/p.P0,2)}; razem ${pc(r,2)}.`)
+ ]}},trap:'Pominięcie dywidendy daje 10,9% (brak takiej odpowiedzi). Dzielimy przez cenę <b>zakupu</b> (110), nie przez cenę oczekiwaną.'});
+
+/* =============== STAN =============== */
+const GROUPS=['Makler','Egzamin Doradca','Zadanie dodatkowe','Doradca 2023','Doradca 2022'];
+const GTITLE={'Makler':'Makler (2021–2023)','Egzamin Doradca':'Egzamin Doradca (bez roku)','Zadanie dodatkowe':'Zadanie dodatkowe','Doradca 2023':'Doradca 2023','Doradca 2022':'Doradca 2022'};
+const S={tab:'tasks',cur:T[0].id,tag:'',q:'',rev:{},params:{},prog:{}};
+try{S.prog=JSON.parse(localStorage.getItem('akcje-prog-v1')||'{}')}catch(e){}
+const saveProg=()=>{try{localStorage.setItem('akcje-prog-v1',JSON.stringify(S.prog))}catch(e){}};
+const byId=id=>T.find(t=>t.id===id);
+const allTags=[...new Set(T.flatMap(t=>t.tags))];
+
+function getP(t){ // aktualne parametry (z konwersją %)
+  const o={},st=S.params[t.id]||{};
+  (t.params||[]).forEach(x=>{
+    let v=(x.k in st)?st[x.k]:x.v;
+    if(x.t==='text'){o[x.k]=v;return}
+    v=parseFloat(String(v).replace(',','.'));
+    if(!isFinite(v))v=0;
+    o[x.k]=x.pct?v/100:v;
+  });
+  return o;
+}
+function isDefault(t){const st=S.params[t.id]||{};return !(t.params||[]).some(x=>(x.k in st)&&String(st[x.k])!==String(x.v));}
+function solveTask(t){
+  const r=t.solve(getP(t));
+  let idx=t.ans;
+  if(r.ansIdx!==undefined)idx=r.ansIdx;
+  else if(t.vals&&isFinite(r.value)){let b=0,bd=Infinity;t.vals.forEach((v,i)=>{const d=Math.abs(v-r.value);if(d<bd){bd=d;b=i}});idx=b;}
+  return {...r,idx};
+}
+
+/* =============== RENDER =============== */
+const app=$('#app');
+function setTab(t){S.tab=t;$$('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));render();window.scrollTo(0,0);}
+$$('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+$('#themebtn').onclick=()=>{
+  const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  const nx=cur==='dark'?'light':'dark';document.documentElement.dataset.theme=nx;try{localStorage.setItem('akcje-theme',nx)}catch(e){}
+};
+try{const th=localStorage.getItem('akcje-theme');if(th)document.documentElement.dataset.theme=th}catch(e){}
+$('#menubtn').onclick=()=>{const a=$('aside');if(a)a.classList.toggle('open')};
+
+function updProg(){
+  const n=Object.keys(S.prog).length,ok=Object.values(S.prog).filter(x=>x.ok).length;
+  $('#progtxt').textContent=`${ok}/${T.length} poprawnie · ${n} podejść`;
+  $('#progbar').style.width=(ok/T.length*100)+'%';
+}
+
+function render(){
+  updProg();
+  if(S.tab==='tasks')renderTasks();else if(S.tab==='formulas')renderFormulas();else renderTables();
+}
+
+function matches(t){
+  if(S.tag&&!t.tags.includes(S.tag))return false;
+  if(S.q){const q=S.q.toLowerCase();if(!(t.label+' '+t.text+' '+t.tags.join(' ')).toLowerCase().replace(/<[^>]+>/g,'').includes(q))return false;}
+  return true;
+}
+
+function renderTasks(){
+  app.innerHTML=`<div class="layout"><aside id="side"></aside><section id="main"></section></div>`;
+  renderSide();renderTask();
+}
+function renderSide(){
+  const side=$('#side');
+  const list=GROUPS.map(g=>{
+    const items=T.filter(t=>t.grp===g&&matches(t));
+    if(!items.length)return'';
+    return `<div class="grp">${GTITLE[g]}</div>`+items.map(t=>{
+      const p=S.prog[t.id];const sym=p?(p.ok?'✓':'✗'):'○';const cls=p?(p.ok?'ok':'bad'):'';
+      return `<button class="item" data-id="${t.id}" aria-current="${t.id===S.cur}"><span class="st ${cls}">${sym}</span><span class="lb">${t.label}<small>${t.tags.join(' · ')}</small></span></button>`;
+    }).join('');
+  }).join('')||'<div class="grp">Brak wyników</div>';
+  side.innerHTML=`<div class="sidehead"><input id="q" type="search" placeholder="Szukaj zadania…" value="${S.q.replace(/"/g,'&quot;')}"><div class="chips">${['',...allTags].map(g=>`<button class="chip" data-tag="${g}" aria-pressed="${S.tag===g}">${g||'Wszystkie'}</button>`).join('')}</div></div>${list}`;
+  $$('.item',side).forEach(b=>b.onclick=()=>{S.cur=b.dataset.id;renderSide();renderTask();$('aside').classList.remove('open');window.scrollTo(0,0)});
+  $$('.chip',side).forEach(b=>b.onclick=()=>{S.tag=b.dataset.tag;renderSide()});
+  const q=$('#q',side);q.oninput=e=>{S.q=e.target.value;const pos=e.target.selectionStart;renderSide();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
+}
+
+function renderTask(){
+  const t=byId(S.cur),idx=T.findIndex(x=>x.id===t.id);
+  const prog=S.prog[t.id];
+  const main=$('#main');
+  main.innerHTML=`<div class="card">
+   <div class="thead"><h2>${t.label}</h2></div>
+   <div class="tagrow">${t.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+   <div class="stmt">${t.text}</div>
+   ${t.opts?`<div class="hint">Spróbuj najpierw sam – kliknij odpowiedź:</div><div class="opts" id="opts">${t.opts.map((o,i)=>`<button class="opt" data-i="${i}"><b>${L[i]}</b><span>${o}</span></button>`).join('')}</div><div id="fb"></div>`:'<div class="hint">Zadanie otwarte – policz samodzielnie, a potem odsłoń rozwiązanie.</div>'}
+   ${(t.uses&&t.uses.length)?`<div class="uses">📐 Użyte wzory: ${t.uses.map(u=>`<button class="uchip" data-f="${u}">${FORMS[u].n}${FORMS[u].s?'':' *'}</button>`).join('')}</div>`:''}
+   ${t.params?`<details class="params"><summary>🔧 Zmień dane i zobacz, jak zmieni się rozwiązanie</summary><div class="pgrid">${t.params.map(x=>`<label>${x.l}${x.u?` <span class="u">[${x.u}]</span>`:''}<input data-k="${x.k}" ${x.t==='text'?'type="text"':'type="number" step="any"'} value="${String((S.params[t.id]||{})[x.k]??x.v).replace(/"/g,'&quot;')}"></label>`).join('')}</div><div class="ctrl"><button class="btn" id="preset">↺ Przywróć dane z zadania</button></div></details>`:''}
+   <div class="ctrl"><button class="btn pri" id="next">Pokaż następny krok →</button><button class="btn" id="all">Pokaż całe rozwiązanie</button><button class="btn" id="reset" disabled>Ukryj</button></div>
+   <div id="sol"></div>
+   <div class="nav2"><button class="btn" id="prev" ${idx===0?'disabled':''}>← Poprzednie</button><button class="btn" id="nxt" ${idx===T.length-1?'disabled':''}>Następne →</button></div>
+  </div>`;
+  if(prog&&t.opts)showPick(t,prog.pick,false);
+  $$('.opt',main).forEach(b=>b.onclick=()=>pick(t,+b.dataset.i));
+  $$('.uchip',main).forEach(b=>b.onclick=()=>{S.fhl=b.dataset.f;setTab('formulas')});
+  $$('.pgrid input',main).forEach(i=>i.oninput=()=>{(S.params[t.id]=S.params[t.id]||{})[i.dataset.k]=i.value;renderSol(t)});
+  const pr=$('#preset',main);if(pr)pr.onclick=()=>{delete S.params[t.id];renderTask();};
+  $('#next',main).onclick=()=>{const r=solveTask(t);S.rev[t.id]=Math.min((S.rev[t.id]||0)+1,r.steps.length+1);renderSol(t)};
+  $('#all',main).onclick=()=>{const r=solveTask(t);S.rev[t.id]=r.steps.length+1;renderSol(t)};
+  $('#reset',main).onclick=()=>{S.rev[t.id]=0;renderSol(t)};
+  $('#prev',main).onclick=()=>{S.cur=T[idx-1].id;renderSide();renderTask();window.scrollTo(0,0)};
+  $('#nxt',main).onclick=()=>{S.cur=T[idx+1].id;renderSide();renderTask();window.scrollTo(0,0)};
+  renderSol(t);
+}
+
+function pick(t,i){
+  const ok=i===t.ans;
+  S.prog[t.id]={pick:i,ok};saveProg();updProg();showPick(t,i,true);renderSide();
+}
+function showPick(t,i,anim){
+  const ok=i===t.ans;
+  $$('#opts .opt').forEach((b,k)=>{b.classList.remove('ok','bad','sol');if(k===i)b.classList.add(ok?'ok':'bad');if(!ok&&k===t.ans)b.classList.add('sol');});
+  $('#fb').innerHTML=ok?`<div class="fb ok">✅ Dobrze! Odpowiedź ${L[t.ans]}. Zobacz rozwiązanie, żeby sprawdzić tok rozumowania.</div>`:`<div class="fb bad">❌ Nie tym razem (wybrano ${L[i]}). Prawidłowa odpowiedź to <b>${L[t.ans]}</b>. Odsłoń rozwiązanie krok po kroku, żeby zobaczyć, gdzie mógł powstać błąd.</div>`;
+}
+
+function renderSol(t){
+  let r;
+  try{r=solveTask(t)}catch(e){$('#sol').innerHTML=warn('Nie można policzyć dla takich danych.');return}
+  const n=r.steps.length,k=Math.min(S.rev[t.id]||0,n+1);
+  const dflt=isDefault(t);
+  let h=r.steps.slice(0,k).map((s,i)=>`<div class="step"><h4><i>${i+1}</i>${s.t}</h4><div class="bd">${s.b}</div></div>`).join('');
+  if(k>n){
+    let big,sub='';
+    if(t.opts){
+      if(dflt||t.vals===undefined){
+        big=`Odpowiedź: ${L[r.idx]} – ${t.opts[r.idx].replace(/[;,.]$/,'')}`;
+      }else{
+        big=`Wynik: ${t.fmtV?t.fmtV(r.value):''} → najbliższa odpowiedź ${L[r.idx]}`;
+        sub='<div class="tr">Zmieniono dane, więc wynik nie musi pasować do żadnej z odpowiedzi A–D.</div>';
+      }
+      if(r.valText)big+=`<div class="tr" style="font-weight:500">${r.valText}</div>`;
+      if(t.vals&&isFinite(r.value)&&dflt)big+=`<div class="tr" style="font-weight:500">Obliczony wynik: ${t.fmtV(r.value)}</div>`;
+    }else{
+      big=`Cena jednej akcji Selekta ≈ ${t.fmtV(r.value)}`;
+      if(r.extra)sub=`<div class="tr">${r.extra}</div>`;
+    }
+    h+=`<div class="finalbox"><div class="big">✔ ${big}</div>${sub}${t.trap?`<div class="tr">💡 <b>Pułapka / zapamiętaj:</b> ${t.trap}</div>`:''}${t.unsure?`<div class="tr">⚠️ Ta odpowiedź jest najbardziej prawdopodobna, ale nie mam oficjalnego klucza.</div>`:''}</div>`;
+  }
+  $('#sol').innerHTML=h;
+  const nx=$('#next'),rs=$('#reset');
+  nx.disabled=k>n;nx.textContent=k===0?'Pokaż pierwszy krok →':(k>=n?'Pokaż odpowiedź →':'Pokaż następny krok →');
+  rs.disabled=k===0;
+  $('#all').disabled=k>n;
+  const info=k>0&&k<=n?`<div class="hint">Krok ${k} z ${n}</div>`:'';
+  if(info)$('#sol').insertAdjacentHTML('beforeend',info);
+  if(k>0&&k<=n+1){const last=$('#sol').lastElementChild;if(last&&k>0&&S._scroll){last.scrollIntoView({behavior:'smooth',block:'nearest'})}}
+}
+document.addEventListener('click',e=>{if(e.target.closest('#next,#all'))S._scroll=1;else S._scroll=0;},true);
+
+/* =============== WZORY =============== */
+function renderFormulas(){
+  const keys=Object.keys(FORMS);
+  const sheet=keys.filter(k=>FORMS[k].s),extra=keys.filter(k=>!FORMS[k].s);
+  const usedBy=k=>T.filter(t=>(t.uses||[]).includes(k));
+  const card=k=>{const f=FORMS[k],u=usedBy(k);return `<div class="fcard" id="f-${k}"><h4>${f.n}<span class="badge ${f.s?'sheet':'extra'}">${f.s?'z Twojej kartki':'dodatkowy – nie ma na kartce'}</span></h4>${f.h}<div class="where">${f.w}</div>${u.length?`<div class="uses">Użyte w: ${u.map(t=>`<button class="uchip" data-t="${t.id}">${t.label.replace(/^[^·]+· ?/,'')}</button>`).join('')}</div>`:''}</div>`}
+  app.innerHTML=`<div class="card"><h2 style="margin-top:0">Wzory</h2>
+   <p>Wzory z <b>Twojej kartki</b> (można ich używać na egzaminie) są oznaczone na zielono. Pomarańczowe to <b>dodatkowe zależności</b>, które wynikają z tamtych wzorów lub definicji – przy rozwiązaniach pokazuję, skąd się biorą, więc w razie braku zapamiętania możesz je wyprowadzić.</p>
+   <h3>✅ Z kartki</h3><div class="fcards">${sheet.map(card).join('')}</div>
+   <h3 style="margin-top:22px">➕ Dodatkowe (wyprowadzone / definicje)</h3><div class="fcards">${extra.map(card).join('')}</div>
+   <h3 style="margin-top:22px">🧭 Jak rozpoznać typ zadania</h3>
+   ${ul([
+    '<b>„dywidenda… rośnie o g%… wymagana stopa zwrotu”</b> → Gordon P = DIV₁/(r−g). Sprawdź, czy dywidenda jest za <i>ostatni</i> rok (×(1+g)) czy za <i>przyszły</i>.',
+    '<b>„ROE, wskaźnik wypłaty / zatrzymania zysku”</b> → g = (1−DPO)·ROE.',
+    '<b>Beta, stopa wolna od ryzyka, premia rynkowa</b> → CAPM, koszt kapitału własnego.',
+    '<b>Struktura kapitału + koszt długu + podatek</b> → WACC. Uważaj, czy dane jest D/V czy D/Eq.',
+    '<b>Przepływy FCF + WACC</b> → EV (DCF); przepływy FCFE → dyskontuj kosztem kapitału własnego.',
+    '<b>EBIT, amortyzacja, CAPEX, kapitał obrotowy</b> → FCF = EBIT(1−T)+AM−KO−CAPEX.',
+    '<b>Wskaźniki P/E, P/BV, P/S</b> → mnożniki / przekształcenia (DuPont).',
+    '<b>Dwa okresy z różnym wzrostem</b> → model wielofazowy: dywidendy fazy 1 osobno + Gordon na koniec fazy 1, cofnięte o n lat.'
+   ])}</div>`;
+  $$('.uchip',app).forEach(b=>b.onclick=()=>{S.cur=b.dataset.t;setTab('tasks')});
+  if(S.fhl){const el=$('#f-'+S.fhl);if(el){el.classList.add('hl');el.scrollIntoView({block:'center'});}S.fhl=null}
+}
+
+/* =============== TABLICE =============== */
+const TB={
+ pv:{n:'Mnożnik wartości bieżącej',f:pvf,fm:'PV = (1+r)^−n — ile dziś wart jest 1 zł płatna za n lat'},
+ fv:{n:'Mnożnik wartości przyszłej',f:fvf,fm:'FV = (1+r)^n — ile urośnie 1 zł po n latach'},
+ pva:{n:'Mnożnik wartości bieżącej dla renty',f:pva,fm:'PVA = [1 − (1+r)^−n] / r — wartość dziś n równych płatności po 1 zł (na koniec okresów)'},
+ fva:{n:'Mnożnik wartości przyszłej dla renty',f:fva,fm:'FVA = [(1+r)^n − 1] / r — wartość na koniec n płatności po 1 zł'}
+};
+const PER=[...Array.from({length:30},(_,i)=>i+1),40,50,60,70];
+let tbKey='pv',tbHi=null;
+function renderTables(){
+  app.innerHTML=`<div class="card"><h2 style="margin-top:0">Tablice finansowe</h2>
+  <p>To te same tablice, co w Twoim PDF (okresy 1–30, 40, 50, 60, 70; stopy 1–20%). Wartości są <b>wyliczone ze wzorów</b> (zgodne z PDF co do 4 miejsc po przecinku – sprawdziłem wybrane komórki). Kliknij komórkę, aby podświetlić wiersz i kolumnę.</p>
+  <div class="tabsel">${Object.entries(TB).map(([k,v])=>`<button class="btn" data-k="${k}" aria-pressed="${k===tbKey}">${v.n}</button>`).join('')}</div>
+  <div class="note" id="tfm"></div>
+  <h3>Kalkulator czynnika</h3>
+  <div class="calc"><label>Rodzaj<select id="ck">${Object.entries(TB).map(([k,v])=>`<option value="${k}" ${k===tbKey?'selected':''}>${v.n}</option>`).join('')}</select></label><label>Stopa r [%]<input id="cr" type="number" step="any" value="12"></label><label>Liczba okresów n<input id="cn" type="number" step="1" value="5"></label><div id="cres" class="result" style="margin:0"></div></div>
+  <div class="hint">Wartości pośrednie stóp (np. 10,73%) liczymy wzorem z kalkulatora – tablice zawierają tylko całe procenty.</div>
+  <div class="tblwrap" style="max-height:70vh;overflow:auto;margin-top:12px"><table class="ft" id="ftab"></table></div></div>`;
+  const draw=()=>{
+    const f=TB[tbKey].f;$('#tfm').textContent=TB[tbKey].fm;
+    $$('.tabsel button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===tbKey));
+    let h='<tr><th>Okresy</th>'+Array.from({length:20},(_,i)=>`<th>${i+1}%</th>`).join('')+'</tr>';
+    PER.forEach(n=>{h+=`<tr><td>${n}</td>`+Array.from({length:20},(_,i)=>{const r=(i+1)/100;let v=f(r,n);const big=v>=1000;const cls=tbHi&&tbHi.n===n&&tbHi.r===i+1?'hit':(tbHi&&(tbHi.n===n||tbHi.r===i+1)?'hc':'');return `<td class="${cls}" data-n="${n}" data-r="${i+1}">${fmt(v,4)}</td>`}).join('')+'</tr>'});
+    $('#ftab').innerHTML=h;
+    $$('#ftab td[data-n]').forEach(td=>td.onclick=()=>{tbHi={n:+td.dataset.n,r:+td.dataset.r};draw()});
+    calc();
+  };
+  const calc=()=>{
+    const k=$('#ck').value,r=parseFloat($('#cr').value.replace(',','.'))/100,n=parseFloat($('#cn').value);
+    $('#cres').textContent=(isFinite(r)&&isFinite(n)&&r!==0)?`Czynnik = ${fmt(TB[k].f(r,n),4)}`:'—';
+  };
+  $$('.tabsel button').forEach(b=>b.onclick=()=>{tbKey=b.dataset.k;$('#ck').value=tbKey;draw()});
+  ['ck','cr','cn'].forEach(id=>$('#'+id).oninput=calc);
+  draw();
+}
+
+/* keyboard nav */
+document.addEventListener('keydown',e=>{
+  if(S.tab!=='tasks'||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;
+  const i=T.findIndex(t=>t.id===S.cur);
+  if(e.key==='ArrowRight'&&i<T.length-1){S.cur=T[i+1].id;renderSide();renderTask()}
+  if(e.key==='ArrowLeft'&&i>0){S.cur=T[i-1].id;renderSide();renderTask()}
+  if(e.key===' '&&e.target===document.body){e.preventDefault();const b=$('#next');if(b&&!b.disabled)b.click()}
+});
+render();
+</script>
+</body>
+</html>
